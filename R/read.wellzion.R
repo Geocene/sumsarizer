@@ -28,11 +28,32 @@ read.wellzion <- function(input_file, timezone = "UTC", lablr_output = T) {
 
 	#calculate whether time is four digits or six digits
 	time_length <- unique(unlist(rapply(strsplit(time_test$timestamp, ":"), length, how='list')))
+	am_pm <- any(grepl("AM|PM", time_test$timestamp))
 
 	#calculate the unique sampling interval in minutes
-	if(time_length==2){time_format <- "ymd_HM"}else if(time_length==3){time_format <- "ymd_HMS"}
+	if(time_length==2 & !am_pm){
+		time_format <- "ymd_HM"
+	}else if(time_length==3 & !am_pm){
+		time_format <- "ymd_HMS"
+	}else if(time_length==2 & am_pm){
+		time_format <- "ymd_I!M p!"
+	}else if(time_length==3 & am_pm){
+		time_format <- "ymd_I!MS p!"
+	}
 
-	time_interval <- as.numeric(sort(table(diff(as.numeric(parse_date_time(paste(Sys.Date(),(sapply(strsplit(time_test$timestamp, " "), '[[', 2))), orders=time_format)))), decreasing=TRUE)[1])
+	time_interval <- unique(
+		diff(
+			as.numeric(
+				parse_date_time(
+					paste(Sys.Date(),
+						sapply(strsplit(time_test$timestamp, " "), '[[', 2), 
+						if(am_pm){sapply(strsplit(time_test$timestamp, " "), '[[', 3)}else{""}), 
+					orders=time_format))))/60
+
+	# #calculate the unique sampling interval in minutes
+	# if(time_length==2){time_format <- "ymd_HM"}else if(time_length==3){time_format <- "ymd_HMS"}
+
+	# time_interval <- as.numeric(sort(table(diff(as.numeric(parse_date_time(paste(Sys.Date(),(sapply(strsplit(time_test$timestamp, " "), '[[', 2))), orders=time_format)))), decreasing=TRUE)[1])
 
 	nrow_import <- nrow(file_import)
 	#calculate the total days of sampling
@@ -53,10 +74,14 @@ read.wellzion <- function(input_file, timezone = "UTC", lablr_output = T) {
 	#set the date format to the the value closest to the est_sampling_duration & the appropriate number of time digits
 	orders <- as.character(range_exceedance[range_exceedance$value==min(range_exceedance$value, na.rm=T) & !is.na(range_exceedance$value), 'variable'])
 
-	if(time_length==2){
+	if(time_length==2 & !am_pm){
 		orders <- paste(orders, "_HM", sep="")
-	}else if(time_length==3){
+	}else if(time_length==3 & !am_pm){
 		orders <- paste(orders, "_HMS", sep="")
+	}else if(time_length==2 & am_pm){
+		orders <- paste(orders, "_I!M p!", sep="")
+	}else if(time_length==3 & am_pm){
+		orders <- paste(orders, "_I!MS p!", sep="") 
 	}
 
 	file_import$timestamp <- parse_date_time(file_import$timestamp, orders, tz = timezone)
