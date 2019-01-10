@@ -7,10 +7,11 @@ Authors@R: c(
 			)
 Description: Ingests data from various Stove Use Monitors (SUMS), including commonly used iButtons, Wellzion Thermocouples, Labjack Digis (discontinued), EME kSUMs, etc and converts them to a standard format for easying labeling using LABLR. Words on SL. Words on output reports. 
 Depends: R (>= 3.5.1)
-Imports: 
+Imports:
 		lubridate,
 		tools
 License: MIT
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
+Suggests: testthat
