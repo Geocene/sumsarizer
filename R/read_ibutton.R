@@ -15,6 +15,9 @@
 #' 
 #' @export 
 
+
+#read timezone out of header
+
 read_ibutton <- function(input_file, timezone = "UTC", lablr_output = T) {
 
 	part_number <- strsplit(read.csv(input_file, nrow = 1, header = F, stringsAsFactors = F)$V1, ": ")[[1]][2]

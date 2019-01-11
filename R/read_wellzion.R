@@ -87,8 +87,11 @@ read_wellzion <- function(input_file, timezone = "UTC", lablr_output = T) {
 	file_import$timestamp <- parse_date_time(file_import$timestamp, orders, tz = timezone)
 
 	if(lablr_output) {
-		file_import$timestamp <- strftime(file_import$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz = timezone)
-		write.csv(file_import, file = paste(tools::file_path_sans_ext(input_file), ".lablr.csv", sep=""), row.names = F)
+		output <- file_import
+		output$timestamp <- strftime(file_import$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz = 'timezone')
+		write.csv(output, file = paste(tools::file_path_sans_ext(input_file), ".lablr.csv", sep=""), row.names = F)
 	}
+	
+	file_import$filename <- basename(input_file)
 	return(file_import)
 }
