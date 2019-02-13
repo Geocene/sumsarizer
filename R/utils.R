@@ -27,7 +27,7 @@ import_sums <- function(input_file, ...) {
 	#parse headers to guess the type of file
 	input_header <- suppressWarnings(read.delim(input_file, stringsAsFactors = F, nrow = 20, header = F))
 
-	#one particular sensors text encoding is UCS-2LE; if import fails, try that.
+	#one particular sensor's text encoding is UCS-2LE; if import fails, try that.
 	if(nrow(input_header) == 0) {
 		input_header <- read.delim(input_file, stringsAsFactors = F, nrow = 5, header = F, fileEncoding = "UCS-2LE") 
 	}

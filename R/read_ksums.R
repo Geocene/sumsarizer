@@ -18,49 +18,55 @@
 
 
 read_ksums <- function(input_file, timezone = 'UTC', lablr_output = T, wide = F){
-	#files are non-standard and include comments from the data logger
-	#select only lines with data
-	raw_input_data <- read.delim(input_file)
-	data_lines <- as.numeric(sapply(raw_input_data, function(data_lines) grep('[0-9/0-9/0-9]{2,} [0-9:]{6,},[0-9.,]{3,}', data_lines)))
-	chr_input_data <- as.character(raw_input_data[data_lines,])
 
-	#write out data lines to a temporary file and read back in
-	temp_file <- tempfile()
-	write(chr_input_data, file = temp_file)
-	input_data <- read.csv(temp_file, stringsAsFactors = F, header = F)
-	#remove temporary file
-	unlink(temp_file)
+	if(file.size(input_file)<100){
+		return(NULL)
+	}else{
 
-	#set column names
-	names(input_data) <-  c('timestamp','batt', 'internal_temp', 'tc1', 'tc2', 'tc3')
+		#files are non-standard and include comments from the data logger
+		#select only lines with data
+		raw_input_data <- read.delim(input_file)
+		data_lines <- as.numeric(sapply(raw_input_data, function(data_lines) grep('[0-9/0-9/0-9]{2,} [0-9:]{6,},[0-9.,]{3,}', data_lines)))
+		chr_input_data <- as.character(raw_input_data[data_lines,])
 
-	#deal with timestamps
-	input_data$timestamp <- ymd_hms(input_data$timestamp, tz=timezone)
+		#write out data lines to a temporary file and read back in
+		temp_file <- tempfile()
+		write(chr_input_data, file = temp_file)
+		input_data <- read.csv(temp_file, stringsAsFactors = F, header = F)
+		#remove temporary file
+		unlink(temp_file)
 
-	if(lablr_output) {
-		#reshape2 is much nicer, but using base
-		input_data_long <- reshape(input_data, varying = c('tc1', 'tc2', 'tc3'), v.names = 'value', timevar='variable', times=c('tc1', 'tc2', 'tc3'), direction = 'long', new.row.names = NULL)
-		#drop reshape cruft
-		row.names(input_data_long) <- NULL
-		input_data_long$id <- NULL
-		#drop unnecessary columns
-		input_data_long$batt <- NULL
-		input_data_long$internal_temp <- NULL
-		input_data$timestamp <- strftime(input_data$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz='timezone')
+		#set column names
+		names(input_data) <-  c('timestamp','batt', 'internal_temp', 'tc1', 'tc2', 'tc3')
 
-		#get unique lead ids
-		tc_ids <- unique(input_data_long$variable)
+		#deal with timestamps
+		input_data$timestamp <- ymd_hms(input_data$timestamp, tz=timezone)
 
-		for(i in tc_ids) { 
-			output_data <- input_data_long[input_data_long$variable==i,]
-			output_data$variable <- NULL
-			write.csv(output_data, file = paste(tools::file_path_sans_ext(input_file),".", i, ".lablr.csv", sep=""), row.names = F)
+		if(lablr_output) {
+			#reshape2 is much nicer, but using base
+			input_data_long <- reshape(input_data, varying = c('tc1', 'tc2', 'tc3'), v.names = 'value', timevar='variable', times=c('tc1', 'tc2', 'tc3'), direction = 'long', new.row.names = NULL)
+			#drop reshape cruft
+			row.names(input_data_long) <- NULL
+			input_data_long$id <- NULL
+			#drop unnecessary columns
+			input_data_long$batt <- NULL
+			input_data_long$internal_temp <- NULL
+			input_data$timestamp <- strftime(input_data$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz='timezone')
+
+			#get unique lead ids
+			tc_ids <- unique(input_data_long$variable)
+
+			for(i in tc_ids) { 
+				output_data <- input_data_long[input_data_long$variable==i,]
+				output_data$variable <- NULL
+				write.csv(output_data, file = paste(tools::file_path_sans_ext(input_file),".", i, ".lablr.csv", sep=""), row.names = F)
+			}
 		}
-	}
 
-	if(wide) {
-		return(input_data)
-	}else { 
-		return(input_data_long) 
+		if(wide) {
+			return(input_data)
+		}else { 
+			return(input_data_long) 
+		}
 	}
 }
