@@ -10,6 +10,8 @@ import_lablr(input_file, metadata = NA, ...)
 \item{input_file}{Path to file being imported}
 
 \item{metadata}{Path to file containing metadata for imported files or NA}
+
+\item{...}{not currently used}
 }
 \value{
 A data.frame with at least four columns - timestamp (POSIXct), value (numeric), label (logical), filename (character)

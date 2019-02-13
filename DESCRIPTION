@@ -9,8 +9,11 @@ Description: Ingests data from various Stove Use Monitors (SUMS), including comm
 Depends: R (>= 3.4)
 Imports:
 		lubridate,
-		tools
-License: MIT
+		tools,
+		stats,
+		utils,
+		methods
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1

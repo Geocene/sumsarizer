@@ -16,6 +16,7 @@ f_to_c <- function(F) {
 #' Wellzion SSN-61, Lascar, and EME Systems KSUMs thermocouples. 
 #' 
 #' @param input_file Path to file being imported
+#' @param ... extra arguments to sensor-specific read methods
 #' 
 #' @return A data.frame with two columns - timestamp (POSIXct) and value (numeric)
 #' 
@@ -56,6 +57,7 @@ import_sums <- function(input_file, ...) {
 #' 
 #' @param input_file Path to file being imported
 #' @param metadata Path to file containing metadata for imported files or NA
+#' @param ... not currently used
 #' @return A data.frame with at least four columns - timestamp (POSIXct), value (numeric), label (logical), filename (character)
 #' 
 #' @export
@@ -75,3 +77,13 @@ import_lablr <- function(input_file, metadata = NA, ...) {
 		labeled_file
 	}
 }
+
+#' Sumsarizer
+#'
+#' Ingest, Clean, and Interpret Stove Use Monitoring Data
+#' @rdname sumsarizer
+#' @name sumsarizer
+#' @import lubridate
+#' @importFrom stats reshape
+#' @importFrom utils head read.csv read.delim write.csv
+NULL

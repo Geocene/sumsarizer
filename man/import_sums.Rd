@@ -8,6 +8,8 @@ import_sums(input_file, ...)
 }
 \arguments{
 \item{input_file}{Path to file being imported}
+
+\item{...}{extra arguments to sensor-specific read methods}
 }
 \value{
 A data.frame with two columns - timestamp (POSIXct) and value (numeric)
