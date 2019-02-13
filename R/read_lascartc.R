@@ -16,15 +16,20 @@
 #' @export
 
 read_lascar <- function(input_file, timezone = "UTC", lablr_output = T) {
-	file_import <- read.csv(input_file, skip = 2, header = F)
-	file_import$V1 <- NULL
-	names(file_import) <-  c('timestamp', 'value')
-	file_import$timestamp <- parse_date_time(file_import$timestamp, orders = c("ymd HMS", "dmy HMS", "mdy HMS", "ymd HM", "dmy HM", "mdy HM"), tz = timezone)
-	if(lablr_output) {
-		output <- file_import
-		output$timestamp <- strftime(file_import$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz = 'timezone')
-		write.csv(output, file = paste(tools::file_path_sans_ext(input_file), ".lablr.csv", sep=""), row.names = F)
+	if(file.size(input_file)<100){
+		return(NULL)
+	}else{
+		file_import <- read.csv(input_file, skip = 2, header = F)
+		file_import$V1 <- NULL
+		names(file_import) <-  c('timestamp', 'value')
+		file_import$timestamp <- parse_date_time(file_import$timestamp, orders = c("ymd HMS", "dmy HMS", "mdy HMS", "ymd HM", "dmy HM", "mdy HM"), tz = timezone)
+		if(lablr_output) {
+			output <- file_import
+			output$timestamp <- strftime(file_import$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz = 'timezone')
+			write.csv(output, file = paste(tools::file_path_sans_ext(input_file), ".lablr.csv", sep=""), row.names = F)
+		}
+		file_import$filename <- basename(input_file)
+		file_import$label <- 'null'
+		return(file_import)
 	}
-	file_import$filename <- basename(input_file)
-	return(file_import)
 }
