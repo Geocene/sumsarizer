@@ -83,7 +83,8 @@ import_lablr <- function(input_file, metadata = NA, ...) {
 #' Ingest, Clean, and Interpret Stove Use Monitoring Data
 #' @rdname sumsarizer
 #' @name sumsarizer
-#' @import lubridate
+#' @importFrom lubridate ymd_hms parse_date_time dmy_hms mdy_hms
+#' @import data.table
 #' @importFrom stats reshape
 #' @importFrom utils head read.csv read.delim write.csv
 NULL

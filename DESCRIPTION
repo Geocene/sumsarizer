@@ -12,7 +12,8 @@ Imports:
 		tools,
 		stats,
 		utils,
-		methods
+		methods,
+		data.table
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
