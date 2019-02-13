@@ -1,3 +1,15 @@
+
+#' Sumsarizer
+#'
+#' Ingest, Clean, and Interpret Stove Use Monitoring Data
+#' @rdname sumsarizer
+#' @name sumsarizer
+#' @importFrom lubridate ymd_hms parse_date_time dmy_hms mdy_hms
+#' @import data.table
+#' @importFrom stats reshape
+#' @importFrom utils head read.csv read.delim write.csv
+NULL
+
 #' Convert a temperature in F to C
 #' 
 #' @param F Temperature in F
@@ -78,13 +90,13 @@ import_lablr <- function(input_file, metadata = NA, ...) {
 	}
 }
 
-#' Sumsarizer
-#'
-#' Ingest, Clean, and Interpret Stove Use Monitoring Data
-#' @rdname sumsarizer
-#' @name sumsarizer
-#' @importFrom lubridate ymd_hms parse_date_time dmy_hms mdy_hms
-#' @import data.table
-#' @importFrom stats reshape
-#' @importFrom utils head read.csv read.delim write.csv
-NULL
+#' Estimate Sample Interval
+#' Estimates a sample interval in seconds as the median interval between adjacent samples
+#' @param timestamp a vector of timestamps
+#' @param export
+est_sample_interval <- function(timestamp){
+  difftimes <- as.numeric(diff(sort(timestamp)), units = "secs")
+  sample_interval <- median(difftimes)
+  
+  return(sample_interval)
+}
