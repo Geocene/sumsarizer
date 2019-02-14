@@ -15,9 +15,15 @@ Imports:
 		methods,
 		data.table,
 		caTools,
-		polspline
+		pspline,
+		changepoint,
+		sl3
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Suggests: testthat
+Remotes:
+    github::tlverse/origami,
+    github::tlverse/delayed,
+    github::tlverse/sl3

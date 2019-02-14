@@ -6,10 +6,10 @@
 Generate unique identifiers for each event, based on indicator of being in an event.
 Nonevent periods are labelled NA}
 \usage{
-number_events(event_indicator)
+number_events(label)
 }
 \arguments{
-\item{event_indicator}{A binary vector, where TRUE indicates an event}
+\item{label}{A binary vector, where TRUE indicates an event}
 }
 \description{
 Number Events

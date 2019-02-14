@@ -7,8 +7,7 @@
 #' @importFrom lubridate ymd_hms parse_date_time dmy_hms mdy_hms
 #' @import data.table
 #' @importFrom stats reshape median predict
-#' @importFrom utils head read.csv read.delim write.csv
-#' @import polspline
+#' @importFrom utils head read.csv read.delim write.csv globalVariables
 #' @import caTools
 NULL
 
@@ -95,7 +94,7 @@ import_lablr <- function(input_file, metadata = NA, ...) {
 #' Estimate Sample Interval
 #' Estimates a sample interval in seconds as the median interval between adjacent samples
 #' @param timestamp a vector of timestamps
-#' @param export
+#' @export
 est_sample_interval <- function(timestamp){
   difftimes <- as.numeric(diff(sort(timestamp)), units = "secs")
   sample_interval <- median(difftimes)

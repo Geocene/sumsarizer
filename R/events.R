@@ -1,14 +1,39 @@
 #' Number Events
 #' Generate unique identifiers for each event, based on indicator of being in an event.
 #' Nonevent periods are labelled NA
-#' @param event_indicator A binary vector, where TRUE indicates an event
+#' @param label A binary vector, where TRUE indicates an event
 #' @export
-number_events <- function(event_indicator){
-  runs <- rle(event_indicator)
+number_events <- function(label){
+  runs <- rle(label)
   event_num <- rep(seq_along(runs$lengths),runs$lengths)
-  event_num[event_indicator==FALSE]=NA
+  event_num[label==FALSE]=NA
   
   return(event_num)
+}
+
+
+#' Smooth Events
+#' 
+#' Reduce "blipiness" in event indicators by eliminating small cooking events and gaps
+#' @param label A binary vector, where TRUE indicates an event
+#' @param sample_interval the sample interval in seconds
+#' @param min_event_sec minmum number of seconds in a real event
+#' @param min_break_sec minmum number of seconds in a real non-event
+#' @export
+smooth_events <- function(label, sample_interval, min_event_sec = 5*60, min_break_sec = 30 * 60){
+  
+  rl_obj <- rle(label)
+  
+  #remove short breaks between cooking
+  rl_obj$values[(rl_obj$lengths * sample_interval) < min_break_sec & rl_obj$values == F] = T
+  label <- inverse.rle(rl_obj)
+  
+  #remove short cooking events
+  rl_obj2 <- rle(label)
+  rl_obj2$values[(rl_obj2$lengths * sample_interval) < min_event_sec & rl_obj2$values == T] = F
+  label <- inverse.rle(rl_obj2)
+  
+  return(label)
 }
 
 #' Summarize Events

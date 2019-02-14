@@ -1,164 +1,162 @@
-#' Danny's Magic Cooking Algorithm
-#' TODO: Document
-#' TODO: use set instead of :=
-cooking_danny_algo <- function(one_file, sample_interval){
-  one_file <- copy(one_file)
+globalVariables(c("value", "difftemps", "quantile_difftemps", "difftimes", 
+                  "event_num","cooking_danny","event_max")) 
+
+# Danny's Magic Cooking Algorithm
+cooking_danny_algo <- function(features, sample_interval){
+  
+  features <- copy(features)
   # implement danny cooking algorithm
   threshold <- 50
   
-  one_file[, cooking_danny:=as.numeric(value>threshold)]
+  features[, "cooking_danny":=as.numeric(value>threshold)]
   
   #get rid of highly negative slopes
-  one_file[difftemps < -1*value/500, cooking_danny := 0]
+  features[difftemps < -1*value/500, "cooking_danny":= 0]
   
   #get rid of long runs of negative slopes
-  one_file[quantile_difftemps < 0, cooking_danny := 0]
+  features[quantile_difftemps < 0, "cooking_danny":= 0]
   
   #add highly positive slopes
-  one_file[difftemps > 5, cooking_danny := 1]
+  features[difftemps > 5, "cooking_danny":= 1]
   
   #remove places with gaps longer than the sample interval
-  one_file[difftimes > sample_interval, cooking_danny := 0]
+  features[difftimes > sample_interval, "cooking_danny":= 0]
   
-  #refine the definition of "cooking" into "events"
-  max_break_sec <- 30*60 #max number of seconds to makeup a real break
-  min_event_sec <- 5*60 #minmum number of seconds in a real event
+  #refine the definition of"cooking" into"events"
+  min_event_sec <- 5*60 #min number of seconds in a real event
+  min_break_sec <- 30*60 #min number of seconds to makeup a real break
+  features[,"cooking_danny":=smooth_events(cooking_danny, sample_interval, min_event_sec, min_break_sec)]
+
+  #remove events with very low cooking temps
   min_event_temp <- 50 #minimum temperature in an event to be considered a real event
-  rl_obj <- rle(one_file$cooking_danny)
-  
-  #remove short breaks between cooking
-  rl_obj$values[(rl_obj$lengths * sample_interval) < max_break_sec & rl_obj$values == F] = T
-  cooking_danny <- inverse.rle(rl_obj)
-  
-  #remove short cooking events
-  rl_obj2 <- rle(cooking_danny)
-  rl_obj2$values[(rl_obj2$lengths * sample_interval) < min_event_sec & rl_obj2$values == T] = F
-  cooking_danny <- inverse.rle(rl_obj2)
-  
-  #remove events with very low maximum temperatures
-  rl_obj3 <- rle(cooking_danny)
-  run_lengths <- rl_obj3$lengths
-  one_file[ , event:= rep(seq_along(run_lengths), run_lengths)]
-  rl_obj3$max_temp_in_event <- one_file[,list(run_max=max(value)),by=list(event)]$run_max
-  rl_obj3$values[rl_obj3$max_temp_in_run < min_event_temp & rl_obj3$lengths > 1 & rl_obj3$values == T] = F
-  cooking_danny <- inverse.rle(rl_obj3)
-  one_file$event <- NULL
-  return(cooking_danny)
-  
+  features[,"event_num":=number_events(cooking_danny)]
+  features[,"event_max":=max(value),by=list(event_num)]
+  features[event_max<min_event_temp,cooking_danny:=0]
+  return(features$cooking_danny)
 }
 
+
+#' @rdname make_features
+sumsarizer_feature_names <- c("value", "difftemps", "difftemps_left", "mean_difftemps", 
+                              "sd_difftemps", "quantile_difftemps", "rmin", "rmax", "rmean", 
+                              "temp_rmin", "temp_rmax", "temp_rmean", "slope", "curvature", 
+                              "smoothpred", "temp_sm", "leftsmoothed", "rightsmoothed", "logslope", 
+                              "logcurvature", "logsmoothpred", "leftlogsmoothed", "rightlogsmoothed", 
+                              "cooking_danny")
+
+globalVariables(c("logsmoothpred", "mean_pcooking", "sd_difftemps",
+               "smooth.Pspline", "smoothpred", "timenum", "timestamp"))
 #' Make Features to Predict Cooking
 #' TODO: DOCUMENT
-#' TODO: use set instead of :=
-make_features <- function(one_file){
-  one_file <- copy(one_file)
-  #stuff we need
-  one_file[,index:=1:nrow(one_file)]
-  one_file[,timenum:=as.numeric(timestamp)]
+#' @param timestamps a vector of POSIXct timestamps
+#' @param values a vector of cooking temperatures
+#' @param sample_interval the sample interval in seconds
+#' @importFrom pspline smooth.Pspline
+make_features <- function(timestamps, values, sample_interval=NULL){
   
-  one_file[, difftimes := c(as.numeric(diff(timestamp), units = "secs"), 0)]
-  sample_interval <- median(one_file$difftimes)
+  # make feature data.table
+  features <- data.table(timestamp=timestamps, value=values)
   
-  one_file[, difftemps := c(diff(value), 0)/sample_interval]
-  one_file[, difftemps_left:=c(0,diff(value))/sample_interval]
+  # helper vectors
+  
+  features[, "difftimes":=c(as.numeric(diff(timestamp), units ="secs"), 0)]
+  features[, "timenum":=as.numeric(timestamp)]
+  if(is.null(sample_interval)){
+    sample_interval <- median(features$difftimes)
+    samples_per_hour <- round( (60*60) / sample_interval)
+    
+  }
+
+  features[, "difftemps":= c(diff(value), 0)/sample_interval]
+  features[, "difftemps_left":=c(0,diff(value))/sample_interval]
   
   
   #moving averages
   #hour long windows
-  samples_per_hour <- round(60 / (sample_interval / 60))
-  window <- min(samples_per_hour, nrow(one_file))
-  
-  one_file[, mean_difftemps := runmean(difftemps, 
+  window <- min(samples_per_hour, nrow(features))
+  features[, "mean_difftemps":= runmean(difftemps, 
                                        window, 
                                        align = 'right')]
   
   if(window>2){
-    one_file[, sd_difftemps := runsd(difftemps, 
+    features[, "sd_difftemps":= runsd(difftemps, 
                                      window,
                                      align = 'right')]
-    one_file[1, sd_difftemps := 0]
+    features[1, "sd_difftemps":= 0]
   } else {
-    one_file[, sd_difftemps := 0]
+    features[, "sd_difftemps":= 0]
   }  
   
-  one_file[, quantile_difftemps := runquantile(difftemps, 
+  features[, "quantile_difftemps":= runquantile(difftemps, 
                                                window, 
                                                probs = 0.8,
                                                align = 'right')]
-
-  one_file[,rmin:=runmin(one_file$value,window,align="right")]
-  one_file[,rmax:=runmax(one_file$value,window,align="right")]
-  one_file[,rmean:=runmean(one_file$value,window,align="center")]
   
-  one_file[,temp_rmin:=one_file$value-one_file$rmin]
-  one_file[,temp_rmax:=one_file$value-one_file$rmax]
-  one_file[,temp_rmean:=one_file$value-one_file$rmean]
+  features[, "rmin":=runmin(features$value,window,align="right")]
+  features[, "rmax":=runmax(features$value,window,align="right")]
+  features[, "rmean":=runmean(features$value,window,align="center")]
+  
+  features[,"temp_rmin":=features$value-features$rmin]
+  features[,"temp_rmax":=features$value-features$rmax]
+  features[,"temp_rmean":=features$value-features$rmean]
   
   
   
-
+  
   #spline smoothing
-  spmod <- smooth.Pspline(one_file$timenum,one_file$value,method="4")
+  spmod <- smooth.Pspline(features$timenum,features$value,method="4")
   
-  one_file[,slope:=predict(spmod,timenum,nderiv=1)/sample_interval]
-  one_file[,curvature:=predict(spmod,timenum,nderiv=2)/sample_interval^2]
-  one_file[,smoothpred:=predict(spmod,timenum,nderiv=0)]
+  features[, "slope":=predict(spmod,timenum,nderiv=1)/sample_interval]
+  features[, "curvature":=predict(spmod,timenum,nderiv=2)/sample_interval^2]
+  features[, "smoothpred":=predict(spmod,timenum,nderiv=0)]
   
-  one_file[,temp_sm:=value-smoothpred]
-  one_file[,leftsmoothed:=c(0,diff(smoothpred))/sample_interval]
-  one_file[,rightsmoothed:=c(diff(smoothpred),0)/sample_interval]
+  features[,"temp_sm":=value-smoothpred]
+  features[, "leftsmoothed":=c(0,diff(smoothpred))/sample_interval]
+  features[, "rightsmoothed":=c(diff(smoothpred),0)/sample_interval]
   
   #now on log scale
-  mintemp <- min(one_file$value)-1
-  logspmod <- smooth.Pspline(one_file$timenum,log(one_file$value-mintemp),method="4")
+  mintemp <- min(features$value)-1
+  logspmod <- smooth.Pspline(features$timenum,log(features$value-mintemp),method="4")
   
-  one_file[,logslope:=predict(logspmod,timenum,nderiv=1)/sample_interval]
-  one_file[,logcurvature:=predict(logspmod,timenum,nderiv=2)/sample_interval^2]
-  one_file[,logsmoothpred:=predict(logspmod,timenum,nderiv=0)]
+  features[, "logslope":=predict(logspmod,timenum,nderiv=1)/sample_interval]
+  features[, "logcurvature":=predict(logspmod,timenum,nderiv=2)/sample_interval^2]
+  features[, "logsmoothpred":=predict(logspmod,timenum,nderiv=0)]
   
-  one_file[,leftlogsmoothed:=c(0,diff(logsmoothpred))/sample_interval]
-  one_file[,rightlogsmoothed:=c(diff(logsmoothpred),0)/sample_interval]
+  features[, "leftlogsmoothed":=c(0,diff(logsmoothpred))/sample_interval]
+  features[, "rightlogsmoothed":=c(diff(logsmoothpred),0)/sample_interval]
   
   
   
-  # one_file$ismax=one_file$rmax==one_file$value
-  # maxes=which(one_file$ismax)
-  # one_file$lastmaxindex=rep(maxes,diff(c(maxes,nrow(one_file)+1)))
-  # one_file$lastmax=one_file$value[one_file$lastmaxindex]
-  # one_file$slopefrommax=ifelse(one_file$lastmaxindex==one_file$index,0,(one_file$value-one_file$lastmax)/(one_file$index-one_file$lastmaxindex))/sample_interval
+  # features$ismax=features$rmax==features$value
+  # maxes=which(features$ismax)
+  # features$lastmaxindex=rep(maxes,diff(c(maxes,nrow(features)+1)))
+  # features$lastmax=features$value[features$lastmaxindex]
+  # features$slopefrommax=ifelse(features$lastmaxindex==features$index,0,(features$value-features$lastmax)/(features$index-features$lastmaxindex))/sample_interval
   # 
   # #try to fit an exponential to cooling
-  # one_file$expdecay=ifelse(one_file$value==one_file$lastmax,0,-(sample_interval/(one_file$index-one_file$lastmaxindex))*log((one_file$value-mintemp)/(one_file$lastmax-mintemp)))
-  # decreasing=one_file[one_file$right<=0&one_file$left<=0,]
+  # features$expdecay=ifelse(features$value==features$lastmax,0,-(sample_interval/(features$index-features$lastmaxindex))*log((features$value-mintemp)/(features$lastmax-mintemp)))
+  # decreasing=features[features$right<=0&features$left<=0,]
   # z=log((decreasing$right/sample_interval+decreasing$value-mintemp)/(decreasing$value-mintemp))
   # lambda=mean(z)
   # 
-  # one_file$exppred=(one_file$value-one_file$left/sample_interval-mintemp)*exp(lambda)
-  # one_file$expresid=one_file$value-one_file$exppred-mintemp
-  # one_file$lexpresid=one_file$exppred/(one_file$value-mintemp)
+  # features$exppred=(features$value-features$left/sample_interval-mintemp)*exp(lambda)
+  # features$expresid=features$value-features$exppred-mintemp
+  # features$lexpresid=features$exppred/(features$value-mintemp)
   # 
-  #expsub=which(one_file$lastmax!=one_file$value)
-  #expmod=nls(value ~ lastmax * exp(-1*lambda*(index-lastmaxindex)),data=one_file[expsub,],start=list(lambda=1),trace=T)
-  #one_file$expresid=0
-  #one_file$expresid[expsub]=resid(expmod)
+  #expsub=which(features$lastmax!=features$value)
+  #expmod=nls(value ~ lastmax * exp(-1*lambda*(index-lastmaxindex)),data=features[expsub,],start=list(lambda=1),trace=T)
+  #features$expresid=0
+  #features$expresid[expsub]=resid(expmod)
   
-  # one_file$ismin=one_file$rmin==one_file$value
-  # mins=which(one_file$ismin)
-  # one_file$lastminindex=rep(mins,diff(c(mins,nrow(one_file)+1)))
-  # one_file$lastmin=one_file$value[one_file$lastminindex]
-  # one_file$slopefrommin=ifelse(one_file$lastminindex==one_file$index,0,(one_file$value-one_file$lastmin)/(one_file$index-one_file$lastminindex))/sample_interval
-  # one_file$expgrowth=ifelse(one_file$value==one_file$lastmin,0,(1/(one_file$index-one_file$lastminindex))*log((one_file$value-mintemp)/(one_file$lastmin-mintemp)))
+  # features$ismin=features$rmin==features$value
+  # mins=which(features$ismin)
+  # features$lastminindex=rep(mins,diff(c(mins,nrow(features)+1)))
+  # features$lastmin=features$value[features$lastminindex]
+  # features$slopefrommin=ifelse(features$lastminindex==features$index,0,(features$value-features$lastmin)/(features$index-features$lastminindex))/sample_interval
+  # features$expgrowth=ifelse(features$value==features$lastmin,0,(1/(features$index-features$lastminindex))*log((features$value-mintemp)/(features$lastmin-mintemp)))
   
   # danny_algo
-  one_file[,cooking_danny:=cooking_danny_algo(one_file,sample_interval)]
-  
-  return(one_file)
+  features[, "cooking_danny":=cooking_danny_algo(features,sample_interval)]
+  features <- features[,sumsarizer_feature_names, with = FALSE]
+  return(features)
 }
-
-#' @rdname make_features
-FEATURE_NAMES=c("value", "difftemps", "difftemps_left", "mean_difftemps", 
-                "sd_difftemps", "quantile_difftemps", "rmin", "rmax", "rmean", 
-                "temp_rmin", "temp_rmax", "temp_rmean", "slope", "curvature", 
-                "smoothpred", "temp_sm", "leftsmoothed", "rightsmoothed", "logslope", 
-                "logcurvature", "logsmoothpred", "leftlogsmoothed", "rightlogsmoothed", 
-                "cooking_danny")
