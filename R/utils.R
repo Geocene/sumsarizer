@@ -6,8 +6,10 @@
 #' @name sumsarizer
 #' @importFrom lubridate ymd_hms parse_date_time dmy_hms mdy_hms
 #' @import data.table
-#' @importFrom stats reshape
+#' @importFrom stats reshape median predict
 #' @importFrom utils head read.csv read.delim write.csv
+#' @import polspline
+#' @import caTools
 NULL
 
 #' Convert a temperature in F to C
