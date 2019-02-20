@@ -101,9 +101,13 @@ read_ibutton <- function(input_file, timezone = "UTC", lablr_output = T) {
 		file_import$value[file_import$unit == "F"] <- f_to_c(file_import$value[file_import$unit == "F"])
 
 		if(lablr_output) {
-			file_import$unit <- NULL
-			file_import$timestamp <- strftime(file_import$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz = timezone)
-			write.csv(file_import, file = paste(tools::file_path_sans_ext(input_file), ".lablr.csv", sep=""), row.names = F)
+			output <- file_import
+			output$unit <- NULL
+			output$timestamp <- strftime(file_import$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz = timezone)
+			output$label <- 0
+			output$filename <- basename(input_file)
+			output <- output[, c(4,1,2,3)]
+			write.csv(output, file = paste(tools::file_path_sans_ext(input_file), ".lablr.csv", sep=""), row.names = F)
 		}
 
 		file_import$label <- 'null'

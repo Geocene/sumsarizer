@@ -57,9 +57,12 @@ read_ksums <- function(input_file, timezone = 'UTC', lablr_output = T, wide = F)
 			tc_ids <- unique(input_data_long$variable)
 
 			for(i in tc_ids) { 
-				output_data <- input_data_long[input_data_long$variable==i,]
-				output_data$variable <- NULL
-				write.csv(output_data, file = paste(tools::file_path_sans_ext(input_file),".", i, ".lablr.csv", sep=""), row.names = F)
+				output<- input_data_long[input_data_long$variable==i,]
+				output$filename <- paste(tools::file_path_sans_ext(basename(input_file)),'.',i, '.csv', sep="")
+				output$variable <- NULL
+				output$label <- 0
+				output <- output[, c(3,1,2,4)]
+				write.csv(output, file = paste(tools::file_path_sans_ext(input_file),".", i, ".lablr.csv", sep=""), row.names = F)
 			}
 		}
 
