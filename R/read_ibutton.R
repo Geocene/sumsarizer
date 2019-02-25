@@ -98,8 +98,7 @@ read_ibutton <- function(input_file, timezone = "UTC", lablr_output = T) {
 		file_import$timestamp <- parse_date_time(file_import$timestamp, orders, tz = timezone)
 
 		#F to C
-		file_import$value <- as.character(file_import$value)
-		file_import$value[file_import$unit == "F"] <- f_to_c(as.numeric(file_import$value[file_import$unit == "F"]))
+		file_import$value[file_import$unit == "F"] <- f_to_c(file_import$value[file_import$unit == "F"])
 		file_import$unit[file_import$unit == "F"] <- "C"
 
 		if(lablr_output) {
