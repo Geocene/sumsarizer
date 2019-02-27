@@ -18,7 +18,7 @@
 
 #read timezone out of header
 
-read_ibutton <- function(input_file, timezone = "UTC", lablr_output = T) {
+read_ibutton <- function(input_file, timezone = "UTC", lablr_output = F) {
 
 	if(file.size(input_file)<100){
 		return(NULL)
@@ -108,9 +108,10 @@ read_ibutton <- function(input_file, timezone = "UTC", lablr_output = T) {
 			output$label <- 0
 			output$filename <- basename(input_file)
 			output <- output[, c(4,1,2,3)]
-			write.csv(output, file = paste(tools::file_path_sans_ext(input_file), ".lablr.csv", sep=""), row.names = F)
+			write.csv(output, file = paste(tools::file_path_sans_ext(input_file), ".trainset.csv", sep=""), row.names = F)
 		}
 
+		file_import$filename <- basename(input_file)
 		file_import$label <- 'null'
 
 		return(file_import)

@@ -17,7 +17,7 @@
 #' @export
 
 
-read_ksums <- function(input_file, timezone = 'UTC', lablr_output = T, wide = F){
+read_ksums <- function(input_file, timezone = 'UTC', lablr_output = F, wide = F){
 
 	if(file.size(input_file)<100){
 		return(NULL)
@@ -42,11 +42,12 @@ read_ksums <- function(input_file, timezone = 'UTC', lablr_output = T, wide = F)
 		#deal with timestamps
 		input_data$timestamp <- ymd_hms(input_data$timestamp, tz=timezone)
 
+		input_data_long <- reshape(input_data, varying = c('tc1', 'tc2', 'tc3'), v.names = 'value', timevar='variable', times=c('tc1', 'tc2', 'tc3'), direction = 'long', new.row.names = NULL)
+		row.names(input_data_long) <- NULL
+
 		if(lablr_output) {
 			#reshape2 is much nicer, but using base
-			input_data_long <- reshape(input_data, varying = c('tc1', 'tc2', 'tc3'), v.names = 'value', timevar='variable', times=c('tc1', 'tc2', 'tc3'), direction = 'long', new.row.names = NULL)
 			#drop reshape cruft
-			row.names(input_data_long) <- NULL
 			input_data_long$id <- NULL
 			#drop unnecessary columns
 			input_data_long$batt <- NULL
@@ -62,13 +63,15 @@ read_ksums <- function(input_file, timezone = 'UTC', lablr_output = T, wide = F)
 				output$variable <- NULL
 				output$label <- 0
 				output <- output[, c(3,1,2,4)]
-				write.csv(output, file = paste(tools::file_path_sans_ext(input_file),".", i, ".lablr.csv", sep=""), row.names = F)
+				write.csv(output, file = paste(tools::file_path_sans_ext(input_file),".", i, ".trainset.csv", sep=""), row.names = F)
 			}
 		}
 
 		if(wide) {
+			input_data$filename <- basename(input_file)
 			return(input_data)
 		}else { 
+			input_data_long$filename <- basename(input_file)
 			return(input_data_long) 
 		}
 	}
