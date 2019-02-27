@@ -8,7 +8,7 @@
 #'
 #' @param input_file Path to the Wellzion SSN61 file to be read in
 #' @param timezone Timezone. Defaults to UTC.
-#' @param lablr_output Output a file for use with LABLR.
+#' @param trainset_output Output a file for use with TRAINSET.
 #' 
 #' @return A data.frame with two columns - timestamp (POSIXct) and value (numeric) 
 #' 
@@ -16,7 +16,7 @@
 #' 
 #' @export
 
-read_wellzion <- function(input_file, timezone = "UTC", lablr_output = F) {
+read_wellzion <- function(input_file, timezone = "UTC", trainset_output = F) {
 
 	if(file.size(input_file)<100){
 		return(NULL)

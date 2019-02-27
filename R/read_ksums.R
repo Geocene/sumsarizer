@@ -6,7 +6,7 @@
 #'
 #' @param input_file Path to kSUMs file
 #' @param timezone Timezone. Defaults to UTC.
-#' @param lablr_output Output a unique file for each thermocouple lead for use with LABLR.
+#' @param trainset_output Output a unique file for each thermocouple lead for use with TRAINSET.
 #' @param wide Specifies the format of the returned data -- either a wide data.frame or a list 
 #' 				of data.frames (one for each sensing element).
 #' 
@@ -17,7 +17,7 @@
 #' @export
 
 
-read_ksums <- function(input_file, timezone = 'UTC', lablr_output = F, wide = F){
+read_ksums <- function(input_file, timezone = 'UTC', trainset_output = F, wide = F){
 
 	if(file.size(input_file)<100){
 		return(NULL)
