@@ -23,7 +23,7 @@ read_lascar <- function(input_file, timezone = "UTC", trainset_output = F) {
 		file_import$V1 <- NULL
 		names(file_import) <-  c('timestamp', 'value')
 		file_import$timestamp <- parse_date_time(file_import$timestamp, orders = c("ymd HMS", "dmy HMS", "mdy HMS", "ymd HM", "dmy HM", "mdy HM"), tz = timezone)
-		if(lablr_output) {
+		if(trainset_output) {
 			output <- file_import
 			output$filename  <- basename(input_file)
 			output$label <- 0

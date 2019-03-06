@@ -45,7 +45,7 @@ read_ksums <- function(input_file, timezone = 'UTC', trainset_output = F, wide =
 		input_data_long <- reshape(input_data, varying = c('tc1', 'tc2', 'tc3'), v.names = 'value', timevar='variable', times=c('tc1', 'tc2', 'tc3'), direction = 'long', new.row.names = NULL)
 		row.names(input_data_long) <- NULL
 
-		if(lablr_output) {
+		if(trainset_output) {
 			#reshape2 is much nicer, but using base
 			#drop reshape cruft
 			input_data_long$id <- NULL

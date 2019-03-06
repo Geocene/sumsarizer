@@ -101,7 +101,7 @@ read_ibutton <- function(input_file, timezone = "UTC", trainset_output = F) {
 		file_import$value[file_import$unit == "F"] <- f_to_c(file_import$value[file_import$unit == "F"])
 		file_import$unit[file_import$unit == "F"] <- "C"
 
-		if(lablr_output) {
+		if(trainset_output) {
 			output <- file_import
 			output$unit <- NULL
 			output$timestamp <- strftime(file_import$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz = timezone)

@@ -91,7 +91,7 @@ read_wellzion <- function(input_file, timezone = "UTC", trainset_output = F) {
 
 		file_import$timestamp <- parse_date_time(file_import$timestamp, orders, tz = timezone)
 
-		if(lablr_output) {
+		if(trainset_output) {
 			output <- file_import
 			output$filename <- basename(input_file)
 			output$timestamp <- strftime(file_import$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz = 'timezone')
