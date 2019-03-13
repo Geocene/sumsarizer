@@ -106,12 +106,12 @@ read_ibutton <- function(input_file, timezone = "UTC", trainset_output = F) {
 			output$unit <- NULL
 			output$timestamp <- strftime(file_import$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz = timezone)
 			output$label <- 0
-			output$filename <- basename(input_file)
+			output$filename <- file_path_sans_ext(basename(input_file))
 			output <- output[, c(4,1,2,3)]
 			write.csv(output, file = paste(tools::file_path_sans_ext(input_file), ".trainset.csv", sep=""), row.names = F)
 		}
 
-		file_import$filename <- basename(input_file)
+		file_import$filename <- file_path_sans_ext(basename(input_file))
 		file_import$label <- 'null'
 
 		return(file_import)

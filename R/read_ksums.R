@@ -59,19 +59,19 @@ read_ksums <- function(input_file, timezone = 'UTC', trainset_output = F, wide =
 
 			for(i in tc_ids) { 
 				output<- input_data_long[input_data_long$variable==i,]
-				output$filename <- paste(tools::file_path_sans_ext(basename(input_file)),'.',i, '.csv', sep="")
+				output$filename <- paste(tools::file_path_sans_ext(basename(input_file)),'-',i, '.', sep="")
 				output$variable <- NULL
 				output$label <- 0
 				output <- output[, c(3,1,2,4)]
-				write.csv(output, file = paste(tools::file_path_sans_ext(input_file),".", i, ".trainset.csv", sep=""), row.names = F)
+				write.csv(output, file = paste(tools::file_path_sans_ext(input_file),"-", i, ".trainset.csv", sep=""), row.names = F)
 			}
 		}
 
 		if(wide) {
-			input_data$filename <- basename(input_file)
+			input_data$filename <- file_path_sans_ext(basename(input_file))
 			return(input_data)
 		}else { 
-			input_data_long$filename <- basename(input_file)
+			input_data_long$filename <- file_path_sans_ext(basename(input_file))
 			return(input_data_long) 
 		}
 	}

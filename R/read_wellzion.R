@@ -93,14 +93,14 @@ read_wellzion <- function(input_file, timezone = "UTC", trainset_output = F) {
 
 		if(trainset_output) {
 			output <- file_import
-			output$filename <- basename(input_file)
+			output$filename <- tools::file_path_sans_ext(basename(input_file))
 			output$timestamp <- strftime(file_import$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz = 'timezone')
 			output$label <- 0
 			output <- output[, c(3,1,2,4)]
 			write.csv(output, file = paste(tools::file_path_sans_ext(input_file), ".trainset.csv", sep=""), row.names = F)
 		}
 		
-		file_import$filename <- basename(input_file)
+		file_import$filename <- tools::file_path_sans_ext(basename(input_file))
 		return(file_import)
 	}
 }

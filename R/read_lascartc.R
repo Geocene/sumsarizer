@@ -25,13 +25,13 @@ read_lascar <- function(input_file, timezone = "UTC", trainset_output = F) {
 		file_import$timestamp <- parse_date_time(file_import$timestamp, orders = c("ymd HMS", "dmy HMS", "mdy HMS", "ymd HM", "dmy HM", "mdy HM"), tz = timezone)
 		if(trainset_output) {
 			output <- file_import
-			output$filename  <- basename(input_file)
+			output$filename  <- tools::file_path_sans_ext(basename(input_file))
 			output$label <- 0
 			output$timestamp <- strftime(file_import$timestamp , "%Y-%m-%dT%H:%M:%S%z", tz = 'timezone')
 			output <- output[, c(3,1,2,4)]
 			write.csv(output, file = paste(tools::file_path_sans_ext(input_file), ".trainset.csv", sep=""), row.names = F)
 		}
-		file_import$filename  <- basename(input_file)
+		file_import$filename  <- tools::file_path_sans_ext(basename(input_file))
 		return(file_import)
 	}
 }
