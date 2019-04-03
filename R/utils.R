@@ -101,3 +101,22 @@ est_sample_interval <- function(timestamp){
   
   return(sample_interval)
 }
+
+#' Import SUMs File, Label Events, and Provide Summary Data
+#' Imports SUMs files, labels events using a user-specified algorithm, and outputs a list of items including an object with the number of events and total duration of cooking, a table of event start times, stop times, duration, and min and max temperatures; and the raw data with labels. 
+#' @param file Path to file being imported
+#' @param algorithm Algorithm applied to convert temperature data into cooking
+#' @param min_event_sec minmum number of seconds in a real event
+#' @param min_break_sec minmum number of seconds in a real non-event
+#' @export
+
+import_and_summarize <- function(file, algorithm = 'hapin_cooking_event_detector', min_event_sec = 10*60, min_break_sec = 30 * 60){
+	import_data <- as.data.table(import_sums(file))
+	sample_interval_sec <- est_sample_interval(import_data$timestamp)
+	if(algorithm == 'hapin_cooking_event_detector'){
+		import_data <- hapin_cooking_event_detector(test2[value>0 & value<1000])
+	}
+	import_data[, event_smooth:=smooth_events(event_raw, sample_interval_sec, min_event_sec, min_break_sec)]
+	import_data[, event_num:=number_events(event_smooth)]
+	return(list(list_of_events = as.data.table(list_events(import_data)), event_summary = summarize_events(import_data$event_num, sample_interval_sec), labeled_data = import_data))
+}
