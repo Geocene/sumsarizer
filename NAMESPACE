@@ -2,6 +2,7 @@
 
 export(est_sample_interval)
 export(f_to_c)
+export(hapin_cooking_event_detector)
 export(import_lablr)
 export(import_sums)
 export(number_events)

@@ -4,23 +4,23 @@
 \alias{read_ibutton}
 \title{Read iButton Thermocron files}
 \usage{
-read_ibutton(input_file, timezone = "UTC", lablr_output = T)
+read_ibutton(input_file, timezone = "UTC", trainset_output = F)
 }
 \arguments{
 \item{input_file}{Path to iButton file}
 
 \item{timezone}{Timezone. Defaults to UTC.}
 
-\item{lablr_output}{Output a file for use with LABLR.}
+\item{trainset_output}{Output a file for use with TRAINSET with four columns: filename, timestamp, value, label}
 }
 \value{
-A data.frame with two columns - timestamp (POSIXct) and value (numeric)
+A data.frame with five columns - timestamp (POSIXct), unit (character), value (numeric), filename (character), and label.
 }
 \description{
 This function reads in data downloaded from Maxim iButton Thermocrons. It assumes
-input files are CSVs exported from Maxim's OneWireViwer. It returns a two column data.frame: timestamp 
-(POSIXct) and value (numeric). The default timezone is UTC, but can be otherwise specified. See 
-\code{\link{timezones}} for more details.
+input files are CSVs exported from Maxim's OneWireViwer. It returns a five column data.frame: timestamp 
+(POSIXct), unit (character), value (numeric), filename (character), and label. The default timezone is UTC, 
+but can be otherwise specified. See \code{\link{timezones}} for more details.
 }
 \seealso{
 \code{\link{timezones}}

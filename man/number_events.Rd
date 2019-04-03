@@ -2,9 +2,7 @@
 % Please edit documentation in R/events.R
 \name{number_events}
 \alias{number_events}
-\title{Number Events
-Generate unique identifiers for each event, based on indicator of being in an event.
-Nonevent periods are labelled NA}
+\title{Number Events}
 \usage{
 number_events(label)
 }
@@ -12,7 +10,6 @@ number_events(label)
 \item{label}{A binary vector, where TRUE indicates an event}
 }
 \description{
-Number Events
 Generate unique identifiers for each event, based on indicator of being in an event.
 Nonevent periods are labelled NA
 }
