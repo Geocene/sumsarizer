@@ -22,6 +22,8 @@ number_events <- function(label){
 #' @export
 smooth_events <- function(label, sample_interval, min_event_sec = 5*60, min_break_sec = 30 * 60){
   
+  # use first entry if sample interval is vector
+  sample_interval <- sample_interval[1]
   rl_obj <- rle(label)
   
   #remove short breaks between cooking
@@ -54,21 +56,19 @@ summarize_events <- function(event_num, sample_interval_secs){
 #' Generate a list of events
 #' @param labeled_data dataframe of labeled events, with, at minimum, timestamp, value, and event_num
 #' @export
-list_events <- function(labeled_data){
-    sample_interval_sec = est_sample_interval(labeled_data$timestamp)
-
-    events = labeled_data %>%
-      group_by(event_num) %>%
-      summarise(
-        start_time = min(timestamp, na.rm = T),
-        stop_time = max(timestamp, na.rm = T),
-        duration_mins = (as.numeric(difftime(stop_time, start_time, unit='secs')) + sample_interval_sec)/60,
-        min_temp = min(value, na.rm = T),
-        max_temp = max(value, na.rm = T),
-        kind_id = 'cooking',
-        created_at = strftime(Sys.time() , "%Y-%m-%dT%H:%M:%S%z")
-      )
-
-    events = events[complete.cases(events[, 1]), ]
-    return(events)  
+list_events <- function(data, event){
+  sample_interval <- get_sample_interval(data)
+  labeled_data <- copy(data)
+  labeled_data$event_num <- number_events(event)
+  events <- labeled_data[!is.na(event_num),
+                         list(start_time = min(timestamp, na.rm = T),
+                              stop_time = max(timestamp, na.rm = T),
+                              min_temp = min(value, na.rm = T),
+                              max_temp = max(value, na.rm = T)
+                               ),
+                         by=list(event_num)]
+  events[,duration_mins := (as.numeric(difftime(stop_time, start_time, unit='secs')) + sample_interval)/60]
+  
+  
+  return(events[])  
 }

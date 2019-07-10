@@ -1,40 +1,6 @@
 globalVariables(c("value", "difftemps", "quantile_difftemps", "difftimes", 
                   "event_num","cooking_danny","event_max")) 
 
-# Danny's Magic Cooking Algorithm
-cooking_danny_algo <- function(features, sample_interval){
-  
-  features <- copy(features)
-  # implement danny cooking algorithm
-  threshold <- 50
-  
-  features[, "cooking_danny":=as.numeric(value>threshold)]
-  
-  #get rid of highly negative slopes
-  features[difftemps < -1*value/500, "cooking_danny":= 0]
-  
-  #get rid of long runs of negative slopes
-  features[quantile_difftemps < 0, "cooking_danny":= 0]
-  
-  #add highly positive slopes
-  features[difftemps > 5, "cooking_danny":= 1]
-  
-  #remove places with gaps longer than the sample interval
-  features[difftimes > sample_interval, "cooking_danny":= 0]
-  
-  #refine the definition of"cooking" into"events"
-  min_event_sec <- 5*60 #min number of seconds in a real event
-  min_break_sec <- 30*60 #min number of seconds to makeup a real break
-  features[,"cooking_danny":=smooth_events(cooking_danny, sample_interval, min_event_sec, min_break_sec)]
-
-  #remove events with very low cooking temps
-  min_event_temp <- 50 #minimum temperature in an event to be considered a real event
-  features[,"event_num":=number_events(cooking_danny)]
-  features[,"event_max":=max(value),by=list(event_num)]
-  features[event_max<min_event_temp,cooking_danny:=0]
-  return(features$cooking_danny)
-}
-
 
 #' @rdname make_features
 sumsarizer_feature_names <- c("value", "difftemps", "difftemps_left", "mean_difftemps", 

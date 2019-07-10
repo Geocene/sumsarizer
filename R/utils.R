@@ -102,6 +102,19 @@ est_sample_interval <- function(timestamp){
   return(sample_interval)
 }
 
+#' Get Sample Interval, or estimate if not provided
+#' @param data a sumsarizer formatted data table for one sensor mission
+#' @export
+get_sample_interval <- function(data){
+  if(is.null(data$sample_interval)){
+    sample_interval <- est_sample_interval(data$timestamp)
+  } else {
+    sample_interval <- data$sample_interval[1]
+  }
+  
+  return(sample_interval)
+}
+
 #' Import SUMs File, Label Events, and Provide Summary Data
 #' Imports SUMs files, labels events using a user-specified algorithm, and outputs a list of items including an object with the number of events and total duration of cooking, a table of event start times, stop times, duration, and min and max temperatures; and the raw data with labels. 
 #' @param file Path to file being imported

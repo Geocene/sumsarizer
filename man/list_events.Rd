@@ -4,7 +4,7 @@
 \alias{list_events}
 \title{List Events}
 \usage{
-list_events(labeled_data)
+list_events(data, event)
 }
 \arguments{
 \item{labeled_data}{dataframe of labeled events, with, at minimum, timestamp, value, and event_num}
