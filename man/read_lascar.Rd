@@ -4,23 +4,23 @@
 \alias{read_lascar}
 \title{Read a file from Lascar thermocouples}
 \usage{
-read_lascar(input_file, timezone = "UTC", lablr_output = T)
+read_lascar(input_file, timezone = "UTC", trainset_output = F)
 }
 \arguments{
 \item{input_file}{Path to the Lascar Thermocouple file to be read in}
 
 \item{timezone}{Timezone. Defaults to UTC.}
 
-\item{lablr_output}{Output a file for use with LABLR.}
+\item{trainset_output}{Output a file for use with TRAINSET with four columns: filename, timestamp, value, label}
 }
 \value{
-A data.frame with two columns - timestamp (POSIXct) and value (numeric)
+A data.frame with five columns - timestamp (POSIXct), unit (character), value (numeric), filename (character), and label.
 }
 \description{
 This function reads in data downloaded from Lascar thermocouple dataloggers. 
-It returns a two column data.frame: timestamp (POSIXct) and value (numeric).
-The default timezone is UTC, but can be otherwise specified. See \code{\link{timezones}}
-for more details.
+It returns a five column data.frame: timestamp (POSIXct), unit (character), value (numeric), 
+filename (character), and label. The default timezone is UTC, but can be otherwise specified. 
+See \code{\link{timezones}} for more details.
 }
 \seealso{
 \code{\link{timezones}}

@@ -10,14 +10,14 @@ TODO: DOCUMENT}
 \usage{
 sumsarizer_feature_names
 
-make_features(timestamps, values, sample_interval = NULL)
+make_features(data, sample_interval = NULL)
 }
 \arguments{
+\item{sample_interval}{the sample interval in seconds}
+
 \item{timestamps}{a vector of POSIXct timestamps}
 
 \item{values}{a vector of cooking temperatures}
-
-\item{sample_interval}{the sample interval in seconds}
 }
 \description{
 Make Features to Predict Cooking

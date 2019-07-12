@@ -4,25 +4,26 @@
 \alias{read_ksums}
 \title{Read EME Systems kSUMs}
 \usage{
-read_ksums(input_file, timezone = "UTC", lablr_output = T, wide = F)
+read_ksums(input_file, timezone = "UTC", trainset_output = F,
+  wide = F)
 }
 \arguments{
 \item{input_file}{Path to kSUMs file}
 
 \item{timezone}{Timezone. Defaults to UTC.}
 
-\item{lablr_output}{Output a unique file for each thermocouple lead for use with LABLR.}
+\item{trainset_output}{Output a file for use with TRAINSET with four columns: filename, timestamp, value, label}
 
 \item{wide}{Specifies the format of the returned data -- either a wide data.frame or a list 
 of data.frames (one for each sensing element).}
 }
 \value{
-A data.frame with three columns - timestamp (POSIXct) and value (numeric); One for each thermocouple probe.
+A data.frame with five columns - timestamp (POSIXct), unit (character), value (numeric), filename (character), and label.
 }
 \description{
 This function reads in data downloaded from EME Systems kSUMS. 
-It returns a two column data.frame: timestamp (POSIXct) and value (numeric). 
-The default timezone is UTC, but can be otherwise specified. See \code{\link{timezones}} for more details.
+It returns a five column data.frame: timestamp (POSIXct), unit (character), value (numeric), filename (character), 
+and label. The default timezone is UTC, but can be otherwise specified. See \code{\link{timezones}} for more details.
 }
 \seealso{
 \code{\link{timezones}}

@@ -17,7 +17,10 @@ Imports:
 		caTools,
 		pspline,
 		changepoint,
-		sl3
+		sl3,
+		RCurl,
+		tools,
+		xgboost
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
