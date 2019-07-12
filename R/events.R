@@ -56,7 +56,11 @@ summarize_events <- function(event_num, sample_interval_secs){
 #' Generate a list of events
 #' @param labeled_data dataframe of labeled events, with, at minimum, timestamp, value, and event_num
 #' @export
-list_events <- function(data, event){
+list_events <- function(data, event=NULL){
+  if(is.null(event)){
+    event <- data$label
+  }
+  
   sample_interval <- get_sample_interval(data)
   labeled_data <- copy(data)
   labeled_data$event_num <- number_events(event)

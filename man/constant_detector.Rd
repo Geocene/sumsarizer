@@ -17,7 +17,8 @@ constant_detector(data, run_length = 2 * 60 * 60, ...)
 Detects a long run of constant values
 }
 \seealso{
-Other event_detectors: \code{\link{firefinder_detector}},
+Other event_detectors: \code{\link{apply_detector}},
+  \code{\link{firefinder_detector}},
   \code{\link{sl3_model_detector}},
   \code{\link{threshold_detector}}
 }

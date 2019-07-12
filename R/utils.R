@@ -34,7 +34,6 @@ f_to_c <- function(F) {
 #' @return A data.frame with two columns - timestamp (POSIXct) and value (numeric)
 #' @import tools
 #' @export
-
 import_sums <- function(input_file, ...) {
 
 	#parse headers to guess the type of file
@@ -56,6 +55,8 @@ import_sums <- function(input_file, ...) {
 			read_lascar(input_file, ...)
 		} else if(any(unlist(lapply(input_header$V1, function(x) { grepl('Index,Timestamp,Thermocouple', x) })))){
 			read_wellzion(input_file, ...)
+		} else if(grepl('filename,timestamp,value,label', input_header$V1[[1]])){
+		  import_lablr(input_file, ...)
 		} else {
 			message("Input File ", basename(input_file), " is not recognized as a valid SUMs file. Manually import.")
 		}
@@ -74,7 +75,6 @@ import_sums <- function(input_file, ...) {
 #' @return A data.frame with at least four columns - timestamp (POSIXct), value (numeric), label (logical), filename (character)
 #' 
 #' @export
-
 import_lablr <- function(input_file, metadata = NA, ...) {
 
 	labeled_file <- read.csv(input_file, stringsAsFactors = F, header = T)
@@ -122,7 +122,6 @@ get_sample_interval <- function(data){
 #' @param min_event_sec minmum number of seconds in a real event
 #' @param min_break_sec minmum number of seconds in a real non-event
 #' @export
-
 import_and_summarize <- function(file, algorithm = 'hapin_cooking_event_detector', min_event_sec = 10*60, min_break_sec = 30 * 60){
 	import_data <- as.data.table(import_sums(file))
 	sample_interval_sec <- est_sample_interval(import_data$timestamp)
@@ -132,4 +131,17 @@ import_and_summarize <- function(file, algorithm = 'hapin_cooking_event_detector
 	import_data[, event_smooth:=smooth_events(event_raw, sample_interval_sec, min_event_sec, min_break_sec)]
 	import_data[, event_num:=number_events(event_smooth)]
 	return(list(list_of_events = as.data.table(list_events(import_data)), event_summary = summarize_events(import_data$event_num, sample_interval_sec), labeled_data = import_data))
+}
+
+#' Import Folder of files and concatenate
+#'
+#' @param folder Path to folder
+#' @param ... extra arguments to sensor-specific read methods
+#' @export
+import_folder <- function(folder, ...){
+  files <- dir(folder, full.names=TRUE)
+  all_data <- lapply(files, import_sums, ...)
+  data <- rbindlist(all_data)
+  
+  return(data)
 }

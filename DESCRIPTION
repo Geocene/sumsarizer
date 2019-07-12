@@ -21,7 +21,9 @@ Imports:
 		RCurl,
 		tools,
 		xgboost,
-		aws.s3
+		aws.s3,
+		ggplot2,
+		lubridate
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

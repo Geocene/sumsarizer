@@ -1,6 +1,7 @@
 ---
 title: "How to Use SUMSarizer"
-output: rmarkdown::html_vignette
+output: 
+ rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{How to Use SUMSarizer}
   %\VignetteEngine{knitr::rmarkdown}
@@ -8,10 +9,18 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+library(knitr)
+
+knitr::opts_knit$set(
+  style="max-width: 1000px",
+  width=1000
+)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+options(width = 20)
 ```
 
 SUMSarizer is an R library that can be used to help analyze 
@@ -29,32 +38,52 @@ install_github("geocene/sumsarizer")
 library(sumsarizer)
 library(tools)
 library(data.table)
+# tmp_path <- tempdir()
+tmp_path <- "~/tmp"
+example_data_path <- file.path(tmp_path, "example_data")
 ```
 
 # Importing SUMS data
 
 ```{r download_example, eval=FALSE}
-  download_example_data("~/tmp/example_data")
+  download_example_data(example_data_path)
 ```
 
 
 ```{r import_sums}
-#TODO
+  example_sums_file <- file.path(example_data_path, "raw_sums_files","alfashir1_B12.csv")
+  one_sums <- import_sums(example_sums_file)
 ```
 
 # Applying Default SUMSarizer event detection functions
 ## Threshold Detector
 ```{r do_threshold_detector}
-#TODO
+  one_sums_thresholded <- apply_detector(one_sums, threshold_detector)
 ```
 
 ## FireFinder Detector
 ```{r do_firefinder_detector}
-#TODO
+  one_sums_firefinder <- apply_detector(one_sums, firefinder_detector)
 ```
 
 
 ## Summarize Detected Events
+
+```{r summarize_events}
+  events <- list_events(one_sums_firefinder)
+```
+
+
+We can see the first few events here:
+
+```{r summarize_events_table, output="asis", echo=FALSE}
+  kable(head(events))
+```
+
+```{r plot_events, fig.width=10, fig.height=6, fig.align="center"}
+  plot_sums(one_sums_firefinder)
+```
+
 
 
 
@@ -63,35 +92,35 @@ library(data.table)
 ## Exporting SUMS data to TRAINSET for labeling
 
 
-```{r do_export_trainset}
-  raw_sums_path <- "~/tmp/example_data/raw_sums_files/"
-  trainset_path <- "~/tmp/example_data/trainset_files/"
+```{r do_export_trainset, eval=FALSE}
+  raw_sums_path <- file.path(example_data_path, "raw_sums_files")
+  trainset_path <- file.path(example_data_path, "trainset_files")
   raw_sums_to_trainset(raw_sums_path, trainset_path)
 ```
 
 ## Importing labeled data from TRAINSET
 
 ```{r do_import_trainset}
-#TODO
+  labeled_path <- file.path(example_data_path, "labeled_files")
+  labeled_data <- import_folder(labeled_path)
 ```
 
 ## Choosing models for the learner
 
-```{r define_sl3_model}
-#TODO
-```
+See the [sl3 Introductory materials](https://tlverse.org/tlverse-handbook/ensemble-machine-learning.html)
 
 ## Training the model
 
 ```{r train_sl3_model}
-#TODO
+model_obj <- learn_labels(labeled_data)
 ```
 
 
 ## Storing the model object
 
-```{r train_sl3_model}
-#TODO
+```{r save_sl3_model}
+model_file <- file.path(tmp_path,"sumsarizer_model_fit.rdata")
+save(model_obj, file=model_file)
 ```
 
 # Using a trained model
@@ -99,14 +128,16 @@ library(data.table)
 
 ## Using the trained model to predict cooking
 
-```{r do_sl3_detector}
-#TODO
+```{r do_sl3_detector, fig.width=10, fig.height=6, fig.align="center"}
+one_sums_ml <- apply_detector(one_sums, sl3_model_detector, model_obj)
+plot_sums(one_sums_ml)
 ```
 
 ## Thresholding predictions
 
-```{r do_sl3_detector_options}
-#TODO
+```{r do_sl3_detector_options, fig.width=10, fig.height=6, fig.align="center"}
+one_sums_ml_sensitive <- apply_detector(one_sums, sl3_model_detector, model_obj,0.1)
+plot_sums(one_sums_ml_sensitive)
 ```
 
 

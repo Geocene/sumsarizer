@@ -19,7 +19,8 @@ threshold_detector(data, threshold = 75, direction = ">", ...)
 Detects cooking using a simple threshold.
 }
 \seealso{
-Other event_detectors: \code{\link{constant_detector}},
+Other event_detectors: \code{\link{apply_detector}},
+  \code{\link{constant_detector}},
   \code{\link{firefinder_detector}},
   \code{\link{sl3_model_detector}}
 }

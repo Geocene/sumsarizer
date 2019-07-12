@@ -22,7 +22,8 @@ firefinder_detector(data, primary_threshold = 75, min_event_sec = 5 *
 TODO: Danny document this
 }
 \seealso{
-Other event_detectors: \code{\link{constant_detector}},
+Other event_detectors: \code{\link{apply_detector}},
+  \code{\link{constant_detector}},
   \code{\link{sl3_model_detector}},
   \code{\link{threshold_detector}}
 }

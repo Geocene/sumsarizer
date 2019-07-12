@@ -148,7 +148,7 @@ sl3_model_detector <- function(data, model_obj = NULL, threshold = 0.5){
     model_obj <- system.file("extdata/serialized_model.rdata", package="sumsarizer")
   }
 
-  if(url.exists(model_obj)|file.exists(model_obj)){
+  if(is.character(model_obj)&&(url.exists(model_obj)|file.exists(model_obj))){
     if(url.exists(model_obj)){
       model_obj <- url(model_obj)
     }
@@ -156,8 +156,8 @@ sl3_model_detector <- function(data, model_obj = NULL, threshold = 0.5){
     model_obj <- get(obj_name)
     
   }
-  mission_features <- sumsarizer:::make_features(data)
-  mission_task <- make_sl3_Task(mission_features, outcome=NULL,covariates=sumsarizer:::sumsarizer_feature_names)
+
+  mission_task <- sl3_task_from_data(data)
   mission_preds <- model_obj$predict(mission_task)
   raw_label <- as.numeric(mission_preds>threshold)
   sample_interval <- get_sample_interval(data)

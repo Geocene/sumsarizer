@@ -20,7 +20,8 @@ Uses a sl3 machine learner model trained on labels from TRAINSET to detect event
 See TODO to train your own
 }
 \seealso{
-Other event_detectors: \code{\link{constant_detector}},
+Other event_detectors: \code{\link{apply_detector}},
+  \code{\link{constant_detector}},
   \code{\link{firefinder_detector}},
   \code{\link{threshold_detector}}
 }

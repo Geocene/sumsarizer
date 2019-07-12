@@ -112,7 +112,7 @@ read_ibutton <- function(input_file, timezone = "UTC", trainset_output = F) {
 		}
 
 		file_import$filename <- file_path_sans_ext(basename(input_file))
-		file_import$label <- 'null'
+		file_import$label <- 0
 
 		return(file_import)
 	}
