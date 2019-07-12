@@ -18,6 +18,7 @@ Detects a long run of constant values
 }
 \seealso{
 Other event_detectors: \code{\link{firefinder_detector}},
+  \code{\link{sl3_model_detector}},
   \code{\link{threshold_detector}}
 }
 \concept{event_detectors}

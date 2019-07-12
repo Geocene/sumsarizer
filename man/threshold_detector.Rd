@@ -20,6 +20,7 @@ Detects cooking using a simple threshold.
 }
 \seealso{
 Other event_detectors: \code{\link{constant_detector}},
-  \code{\link{firefinder_detector}}
+  \code{\link{firefinder_detector}},
+  \code{\link{sl3_model_detector}}
 }
 \concept{event_detectors}

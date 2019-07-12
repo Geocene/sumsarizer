@@ -23,6 +23,7 @@ TODO: Danny document this
 }
 \seealso{
 Other event_detectors: \code{\link{constant_detector}},
+  \code{\link{sl3_model_detector}},
   \code{\link{threshold_detector}}
 }
 \concept{event_detectors}

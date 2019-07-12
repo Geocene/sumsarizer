@@ -130,6 +130,15 @@ constant_detector <- function(data, run_length=2*60*60, ...) {
   return(event)
 }
 
+#' Use sl3 Machine Learning for event detection
+#' 
+#' Uses a sl3 machine learner model trained on labels from TRAINSET to detect events. 
+#' See TODO to train your own
+#' @param data a sumsarizer formatted data table for one sensor mission
+#' @param model_obj, either a sl3 learner fit object, or a url or path to a .rdata file containing one
+#' @param ... not currently used
+#' @family event_detectors
+#' @export
 #' @importFrom RCurl url.exists
 #' @import sl3
 sl3_model_detector <- function(data, model_obj = NULL){
