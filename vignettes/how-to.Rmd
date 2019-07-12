@@ -16,17 +16,28 @@ knitr::opts_chunk$set(
 
 SUMSarizer is an R library that can be used to help analyze 
 
+# Installation
+```{r installation, eval=FALSE}
+library(devtools)
+install_github("geocene/sumsarizer")
+```
+
 # Setting up R
 
 ```{r setup}
-library(devtools)
-install_github("geocene/sumsarizer")
+
 library(sumsarizer)
 library(tools)
 library(data.table)
 ```
 
 # Importing SUMS data
+
+```{r download_example, eval=FALSE}
+  download_example_data("~/tmp/example_data")
+```
+
+
 ```{r import_sums}
 #TODO
 ```
@@ -51,8 +62,11 @@ library(data.table)
 
 ## Exporting SUMS data to TRAINSET for labeling
 
+
 ```{r do_export_trainset}
-#TODO
+  raw_sums_path <- "~/tmp/example_data/raw_sums_files/"
+  trainset_path <- "~/tmp/example_data/trainset_files/"
+  raw_sums_to_trainset(raw_sums_path, trainset_path)
 ```
 
 ## Importing labeled data from TRAINSET
