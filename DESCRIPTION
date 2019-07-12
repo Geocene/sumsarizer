@@ -20,7 +20,8 @@ Imports:
 		sl3,
 		RCurl,
 		tools,
-		xgboost
+		xgboost,
+		aws.s3
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
