@@ -27,23 +27,72 @@ library(data.table)
 ```
 
 # Importing SUMS data
+```{r import_sums}
+#TODO
+```
 
 # Applying Default SUMSarizer event detection functions
 ## Threshold Detector
-## Constant Detector
+```{r do_threshold_detector}
+#TODO
+```
+
 ## FireFinder Detector
-## Pre-Trained ML Detector
+```{r do_firefinder_detector}
+#TODO
+```
+
+
+## Summarize Detected Events
+
+
 
 # Creating a custom ensemble ML model
+
 ## Exporting SUMS data to TRAINSET for labeling
+
+```{r do_export_trainset}
+#TODO
+```
+
 ## Importing labeled data from TRAINSET
+
+```{r do_import_trainset}
+#TODO
+```
+
 ## Choosing models for the learner
+
+```{r define_sl3_model}
+#TODO
+```
+
 ## Training the model
+
+```{r train_sl3_model}
+#TODO
+```
+
+
 ## Storing the model object
 
+```{r train_sl3_model}
+#TODO
+```
+
 # Using a trained model
+
+
 ## Using the trained model to predict cooking
+
+```{r do_sl3_detector}
+#TODO
+```
+
 ## Thresholding predictions
-## Creating events from thresholded predictions
+
+```{r do_sl3_detector_options}
+#TODO
+```
 
 
