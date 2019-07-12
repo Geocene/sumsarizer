@@ -132,11 +132,12 @@ constant_detector <- function(data, run_length=2*60*60, ...) {
 
 #' @importFrom RCurl url.exists
 #' @import sl3
-sl3_model_detector <- function(data, model_obj){
+sl3_model_detector <- function(data, model_obj = NULL){
   setDT(data)
-  # load model from url if url was provided
-  model_obj <- "https://raw.githubusercontent.com/Geocene/cloud-analytics/master/sl3_serialized_model/serialized_model.rdata?token=AA5WQJW7QEEM425WU6IW4SK5GHXOW"
-  model_obj <- "../cloud-analytics/sl3_serialized_model/serialized_model.rdata"
+  if(is.null(model_obj)){
+    model_obj <- system.file("extdata/serialized_model.rdata", package="sumsarizer")
+  }
+
   if(url.exists(model_obj)|file.exists(model_obj)){
     if(url.exists(model_obj)){
       model_obj <- url(model_obj)

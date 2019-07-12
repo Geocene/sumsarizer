@@ -19,7 +19,8 @@ Imports:
 		changepoint,
 		sl3,
 		RCurl,
-		tools
+		tools,
+		xgboost
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
