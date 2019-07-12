@@ -4,12 +4,14 @@
 \alias{sl3_model_detector}
 \title{Use sl3 Machine Learning for event detection}
 \usage{
-sl3_model_detector(data, model_obj = NULL)
+sl3_model_detector(data, model_obj = NULL, threshold = 0.5)
 }
 \arguments{
 \item{data}{a sumsarizer formatted data table for one sensor mission}
 
-\item{model_obj, }{either a sl3 learner fit object, or a url or path to a .rdata file containing one}
+\item{model_obj}{either a sl3 learner fit object, or a url or path to a .rdata file containing one}
+
+\item{threshold}{a value between 0 and 1 indicating the sensitivity of the event detector}
 
 \item{...}{not currently used}
 }
