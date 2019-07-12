@@ -18,10 +18,10 @@ globalVariables(c("logsmoothpred", "mean_pcooking", "sd_difftemps",
 #' @param values a vector of cooking temperatures
 #' @param sample_interval the sample interval in seconds
 #' @importFrom pspline smooth.Pspline
-make_features <- function(timestamps, values, sample_interval=NULL){
+make_features <- function(data, sample_interval=NULL){
   
   # make feature data.table
-  features <- data.table(timestamp=timestamps, value=values)
+  features <- copy(setDT(data))
   
   # helper vectors
   
@@ -122,7 +122,7 @@ make_features <- function(timestamps, values, sample_interval=NULL){
   # features$expgrowth=ifelse(features$value==features$lastmin,0,(1/(features$index-features$lastminindex))*log((features$value-mintemp)/(features$lastmin-mintemp)))
   
   # danny_algo
-  features[, "cooking_danny":=cooking_danny_algo(features,sample_interval)]
+  features[, "cooking_danny":=firefinder_detector(data)]
   features <- features[,sumsarizer_feature_names, with = FALSE]
   return(features)
 }

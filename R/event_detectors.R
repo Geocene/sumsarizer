@@ -14,6 +14,7 @@ firefinder_detector = function(data,
                                min_event_sec = 5*60,
                                min_break_sec = 30*60,
                                ...) {
+  setDT(data)
   data <- copy(data)
   
   
@@ -89,6 +90,7 @@ firefinder_detector = function(data,
 #' @family event_detectors
 #' @export
 threshold_detector <- function(data, threshold = 75, direction = ">", ...) {
+  setDT(data)
   directions <- c(">","<",">=","<=")
   if(!(direction%in%directions)){
     stop("direction must be one of ",paste(directions,collapse=" "))
@@ -110,6 +112,7 @@ threshold_detector <- function(data, threshold = 75, direction = ">", ...) {
 #' @family event_detectors
 #' @export
 constant_detector <- function(data, run_length=2*60*60, ...) {
+  setDT(data)
   sample_interval <- get_sample_interval(data)
   
   window_size <- run_length / sample_interval
@@ -125,4 +128,30 @@ constant_detector <- function(data, run_length=2*60*60, ...) {
   event <- value_sd==0
   
   return(event)
+}
+
+#' @importFrom RCurl url.exists
+#' @import sl3
+sl3_model_detector <- function(data, model_obj){
+  setDT(data)
+  # load model from url if url was provided
+  model_obj <- "https://raw.githubusercontent.com/Geocene/cloud-analytics/master/sl3_serialized_model/serialized_model.rdata?token=AA5WQJW7QEEM425WU6IW4SK5GHXOW"
+  model_obj <- "../cloud-analytics/sl3_serialized_model/serialized_model.rdata"
+  if(url.exists(model_obj)|file.exists(model_obj)){
+    if(url.exists(model_obj)){
+      model_obj <- url(model_obj)
+    }
+    obj_name <- load(model_obj)
+    model_obj <- get(obj_name)
+    
+  }
+  mission_features <- sumsarizer:::make_features(data)
+  mission_task <- make_sl3_Task(mission_features, outcome=NULL,covariates=sumsarizer:::sumsarizer_feature_names)
+  mission_preds <- model_obj$predict(mission_task)
+  raw_label <- as.numeric(mission_preds>0.5)
+  sample_interval <- get_sample_interval(data)
+  smooth_label <- sumsarizer:::smooth_events(raw_label, sample_interval)
+
+  return(smooth_label)
+  
 }

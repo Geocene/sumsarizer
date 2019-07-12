@@ -32,7 +32,7 @@ f_to_c <- function(F) {
 #' @param ... extra arguments to sensor-specific read methods
 #' 
 #' @return A data.frame with two columns - timestamp (POSIXct) and value (numeric)
-#' 
+#' @import tools
 #' @export
 
 import_sums <- function(input_file, ...) {
