@@ -1,0 +1,49 @@
+---
+title: "How to Use SUMSarizer"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to Use SUMSarizer}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+SUMSarizer is an R library that can be used to help analyze 
+
+# Setting up R
+
+```{r setup}
+library(devtools)
+install_github("geocene/sumsarizer")
+library(sumsarizer)
+library(tools)
+library(data.table)
+```
+
+# Importing SUMS data
+
+# Applying Default SUMSarizer event detection functions
+## Threshold Detector
+## Constant Detector
+## FireFinder Detector
+## Pre-Trained ML Detector
+
+# Creating a custom ensemble ML model
+## Exporting SUMS data to TRAINSET for labeling
+## Importing labeled data from TRAINSET
+## Choosing models for the learner
+## Training the model
+## Storing the model object
+
+# Using a trained model
+## Using the trained model to predict cooking
+## Thresholding predictions
+## Creating events from thresholded predictions
+
+
