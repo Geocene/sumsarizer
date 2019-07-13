@@ -14,6 +14,10 @@ firefinder_detector = function(data,
                                min_event_sec = 5*60,
                                min_break_sec = 30*60,
                                ...) {
+  
+  primary_threshold <- as.numeric(primary_threshold)
+  min_event_sec <- as.numeric(min_event_sec)
+  min_break_sec <- as.numeric(min_break_sec)
   setDT(data)
   data <- copy(data)
   
@@ -90,6 +94,8 @@ firefinder_detector = function(data,
 #' @family event_detectors
 #' @export
 threshold_detector <- function(data, threshold = 75, direction = ">", ...) {
+  threshold <- as.numeric(threshold)
+  
   setDT(data)
   directions <- c(">","<",">=","<=")
   if(!(direction%in%directions)){
@@ -143,6 +149,7 @@ constant_detector <- function(data, run_length=2*60*60, ...) {
 #' @importFrom RCurl url.exists
 #' @import sl3
 sl3_model_detector <- function(data, model_obj = NULL, threshold = 0.5){
+  threshold <- as.numeric(threshold)
   setDT(data)
   if(is.null(model_obj)){
     model_obj <- system.file("extdata/serialized_model.rdata", package="sumsarizer")
