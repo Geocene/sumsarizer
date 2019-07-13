@@ -107,7 +107,7 @@ threshold_detector <- function(data, threshold = 75, direction = ">", ...) {
 #' 
 #' Detects a long run of constant values
 #' @param data a sumsarizer formatted data table for one sensor mission
-#' @param run_length the length of the run in minutes (min 5 samples)
+#' @param run_length the length of the run in seconds (min 5 samples)
 #' @param ... not currently used
 #' @family event_detectors
 #' @export
