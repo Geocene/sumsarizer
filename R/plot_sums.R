@@ -11,8 +11,8 @@ plot_sums <- function(data, events = NULL){
     events <- list_events(data)  
   }
   
-  data$week <- floor_date(data$timestamp, "week")
-  events$week <- floor_date(events$start_time, "week")
+  data$week <- as.character(floor_date(data$timestamp, "week"))
+  events$week <- as.character(floor_date(events$start_time, "week"))
   
   min_value <- min(data$value)
   max_value <- max(data$value)

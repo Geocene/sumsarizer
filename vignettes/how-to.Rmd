@@ -34,7 +34,6 @@ install_github("geocene/sumsarizer")
 # Setting up R
 
 ```{r setup}
-
 library(sumsarizer)
 library(tools)
 library(data.table)
