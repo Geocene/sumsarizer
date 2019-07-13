@@ -67,10 +67,10 @@ Detector functions apply a `true` or `false` label (represented by an integer `1
 
 ## Threshold Detector
 
-The threshold detector will label points based solely on a threshold and a direction. The threshold detector can detect events by comparing a `threshold` to the value of the data using `>`, `<`, `>=`, or `<=`. The default values for the `threshold_detector()` are `threshold_detector(threshold=75, direction=">")`.
+The threshold detector will label points based solely on a threshold and a direction. The threshold detector can detect events by comparing a `threshold` to the value of the data using `>`, `<`, `>=`, or `<=`. The default values for the `threshold_detector()` are `threshold=75` and `direction=">"`.
 
 ```{r do_threshold_detector}
-  one_sums_thresholded <- apply_detector(one_sums, threshold_detector(threshold=75, direction=">"))
+  one_sums_thresholded <- apply_detector(one_sums, threshold_detector, threshold=75, direction=">")
 ```
 
 ## FireFinder Detector
@@ -93,10 +93,9 @@ We can see the first few events here:
   kable(head(events))
 ```
 
-```{r plot_events, fig.width=10, fig.height=6, fig.align="center"}
+```{r plot_events, fig.width=6, fig.height=6, fig.align="center"}
   plot_sums(one_sums_firefinder)
 ```
-
 
 # Creating a custom machine learning model
 
@@ -134,18 +133,16 @@ save(model_obj, file=model_file)
 ```
 
 # Using a trained model
-
-
 ## Using the trained model to predict cooking
 
-```{r do_sl3_detector, fig.width=10, fig.height=6, fig.align="center"}
+```{r do_sl3_detector, fig.width=6, fig.height=6, fig.align="center"}
 one_sums_ml <- apply_detector(one_sums, sl3_model_detector, model_obj)
 plot_sums(one_sums_ml)
 ```
 
 ## Thresholding predictions
 
-```{r do_sl3_detector_options, fig.width=10, fig.height=6, fig.align="center"}
+```{r do_sl3_detector_options, fig.width=6, fig.height=6, fig.align="center"}
 one_sums_ml_sensitive <- apply_detector(one_sums, sl3_model_detector, model_obj,0.1)
 plot_sums(one_sums_ml_sensitive)
 ```

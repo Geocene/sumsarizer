@@ -5,7 +5,7 @@ Authors@R: c(
 			person("Ajay", "Pillarisetti", email = "ajaypillarisetti@gmail.com", role = c("aut", "cre")),
 			person("Daniel", "Wilson", email = "danny@geocene.com", role = c("aut"))
 			)
-Description: Ingests data from various Stove Use Monitors (SUMS), including commonly used iButtons, Wellzion Thermocouples, Labjack Digis (discontinued), EME kSUMs, etc and converts them to a standard format for easying labeling using LABLR. Words on SL. Words on output reports. 
+Description: Ingests data from various Stove Use Monitors (SUMS), including commonly used iButtons, Wellzion Thermocouples, Labjack Digis (discontinued), EME kSUMs, etc and converts them to a standard format for easying labeling using TRAINSET. Words on SL. Words on output reports. 
 Depends: R (>= 3.4)
 Imports:
 		lubridate,
