@@ -4,10 +4,10 @@
 \alias{list_events}
 \title{List Events}
 \usage{
-list_events(data, event = NULL)
+list_events(data)
 }
 \arguments{
-\item{labeled_data}{dataframe of labeled events, with, at minimum, timestamp, value, and event_num}
+\item{data}{a sumsarizer formatted data table for one or more sensor missions}
 }
 \description{
 Generate a list of events

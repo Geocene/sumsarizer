@@ -147,4 +147,14 @@ one_sums_ml_sensitive <- apply_detector(one_sums, sl3_model_detector, model_obj,
 plot_sums(one_sums_ml_sensitive)
 ```
 
+# Sumsarize that biz
+
+```{r sumsarize_that_biz}
+  all_sums <- import_folder(raw_sums_path)
+  all_sums <- apply_detector(all_sums, sl3_model_detector, model_obj)
+  all_events <- list_events(all_sums)
+  summaries <- event_summaries(all_events)
+  kable(summaries)
+```
+
 
