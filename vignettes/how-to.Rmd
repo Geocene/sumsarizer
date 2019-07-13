@@ -73,15 +73,23 @@ The threshold detector will label points based solely on a threshold and a direc
   one_sums_thresholded <- apply_detector(one_sums, threshold_detector, threshold=75, direction=">")
 ```
 
+The threshold function is not a very good algorithm for detecting cooking events, but it can be a very good algorithm for detecting broken sensors. For example, many thermocouple data loggers will report large negative numbers when the thermocouple is missing or damaged; detecting events <-200C can be a good way to detect these kinds of damanged SUMS.
+
 ## FireFinder Detector
 
-FireFinder is Geocene's simplified deterministic algorithm for detecting cooking events. FireFinder considers many features of the data including absolute temperature, slope, running quantiles, and gaps in data when labeling points true or false. Although FireFinder has many steps, we limit the arguements of the `firefinder_detector()` to just `primary_threshold`, `min_event_sec`, and  `min_break_sec`. Roughly speaking, the `primary_threshold` can be thought of as the value above which cooking is likely happening, and below which cooking is unlikely to be happening. However FireFinder may sometimes determine that points above `primary_threshold` are not cooking and points below  `primary_threshold` are indeed cooking. In order to...
+FireFinder is Geocene's simplified deterministic algorithm for detecting cooking events. FireFinder considers many features of the data including absolute temperature, slope, running quantiles, and gaps in data when labeling points true or false. Although FireFinder has many steps, we limit the arguements of the `firefinder_detector()` to just `primary_threshold`, `min_event_sec`, and  `min_break_sec`. 
+
+Roughly speaking, the `primary_threshold` can be thought of as the value above which cooking is likely happening, and below which cooking is unlikely to be happening. However FireFinder may sometimes determine that points above `primary_threshold` are not cooking and points below  `primary_threshold` are indeed cooking. The default value of `primary_threshold` is 75C.
+
+To remove short events and short gaps between events, you can use the `min_event_sec` and  `min_break_sec` arguments. The `min_event_sec` is the minimum number of seconds for an event to be considered an event (and not just an erroneous blip). The `min_break_sec` is the minimum break between two events for those events to be considered separate events; if the break between two events is shorter than `min_break_sec`, the two events will be merged into one event. The default value for `min_event_sec` is 300 seconds (5 minutes), and the default value for `min_break_sec` is 1800 seconds (30 minutes).
 
 ```{r do_firefinder_detector}
   one_sums_firefinder <- apply_detector(one_sums, firefinder_detector)
 ```
 
 ## Summarize Detected Events
+
+After you have detected events, you will want to review the results of your detectors. The simplist way to view the results for a detector is to list its events using the `list_events()` function.
 
 ```{r summarize_events}
   events <- list_events(one_sums_firefinder)
@@ -93,13 +101,35 @@ We can see the first few events here:
   kable(head(events))
 ```
 
-```{r plot_events, fig.width=6, fig.height=6, fig.align="center"}
+We have included a some helpful plotting functions to help you visualize your SUMS data. The `plot_sums()` function takes the processed data from a single SUMS file and plots those data week-by-week with events highlighted in red. This function should help evaluate the performance of the detection. 
+
+```{r plot_events, fig.width=7, fig.height=7, fig.align="center"}
   plot_sums(one_sums_firefinder)
+```
+
+### Refining results
+
+In the case above, the default values for `firefinder_detector()`  did not do a very good job calculating events for this file. Many cooking events were missed. We can adjust the arguments for `firefinder_detector()` to try and get better results. Specifcally, we can adjust the `primary_threshold`:
+
+```{r redo_firefinder_detector}
+  one_sums_firefinder_refined <- apply_detector(one_sums, firefinder_detector, primary_threshold=45)
+```
+
+Lowering the threshold from the default of 75C to 45C will substantially increase the sensitivity of FireFinder.
+
+```{r replot_events, fig.width=7, fig.height=7, fig.align="center"}
+  plot_sums(one_sums_firefinder_refined)
 ```
 
 # Creating a custom machine learning model
 
+If the simple FireFinder model will not work for your dataset, it is possible to train a custom machine learning model using the `sumsarizer` package. To create a custom-trained model, you will need to to created a labeled training set. [TRAINSET](https://trainset.geocene.com) is an online app that has made it easy to label time series data and create a labeled training set. Documentation for how to use TRAINSET is on the TRAINSET website.
+
 ## Exporting SUMS data to TRAINSET for labeling
+
+To get your SUMS data to TRAINSET for labeling, you will need to export your data in the TRAINSET format. The SUMSarizer package has a function, `raw_sums_to_trainset()`, to export data to TRAINSET. This function takes a directory full of SUMS files and turns them into another directory full of TRAINSET-compatible files.
+
+Note: you do not need to label _all_ of your data to create a training set (if you did, you would already have your results!). We recommend labeling about 5% of your data or 25 files, whichever is larger. Make sure you pick a _wide variety_ of very different files to label; if you only label the easy files, your learner will not perform well. The machine learner needs to be trained how to label both easy and difficult files!
 
 ```{r do_export_trainset, eval=FALSE}
   raw_sums_path <- file.path(example_data_path, "raw_sums_files")
@@ -109,6 +139,8 @@ We can see the first few events here:
 
 ## Importing labeled data from TRAINSET
 
+Once you have labeled a subset of your data in TRAINSET, you will need to import the labeled data back into R to train your model:
+
 ```{r do_import_trainset}
   labeled_path <- file.path(example_data_path, "labeled_files")
   labeled_data <- import_folder(labeled_path)
@@ -116,16 +148,19 @@ We can see the first few events here:
 
 ## Choosing models for the learner
 
-See the [sl3 Introductory materials](https://tlverse.org/tlverse-handbook/ensemble-machine-learning.html)
+SUMSarizer uses Super Learer 3  to create custom ensemble models. See the [sl3 Introductory materials](https://tlverse.org/tlverse-handbook/ensemble-machine-learning.html) for more information. By default, we use a single XGBoost model. If you would like to use a more complex and poweful ensemble model, please see the `sl3` documentation and pass the model object as the `sl3_learner` arugement to the `learn_labels()` function. 
 
 ## Training the model
+
+To train a model, just pass the labeled dataset to the `learn_labels()` function. This will return in a trained model object which can use to analyze your data.
 
 ```{r train_sl3_model}
 model_obj <- learn_labels(labeled_data)
 ```
 
-
 ## Storing the model object
+
+If you would like to use your trained model in the future, you can save it. However, the model is only _somewhat_ portable; it only takes a single change to your R configuration to cause your model to break. However, you can always just train a new (same) model using `learn_labels()`.
 
 ```{r save_sl3_model}
 model_file <- file.path(tmp_path,"sumsarizer_model_fit.rdata")
@@ -135,19 +170,28 @@ save(model_obj, file=model_file)
 # Using a trained model
 ## Using the trained model to predict cooking
 
-```{r do_sl3_detector, fig.width=6, fig.height=6, fig.align="center"}
+In the `sumsarizer` package, trained machine learning models are used to detect events in SUMS data in the _exact_ same way that the more explicit `threshold_detector`, `constant_detector`, and `firefinder_detector` work. The machine learning detector function is called `sl3_model_detector()`, and it takes a model object, `model_obj`, as an argument. If you spend the time to do the training, these custom-trained models can have great results:
+
+```{r do_sl3_detector, fig.width=7, fig.height=7, fig.align="center"}
 one_sums_ml <- apply_detector(one_sums, sl3_model_detector, model_obj)
 plot_sums(one_sums_ml)
 ```
 
 ## Thresholding predictions
 
-```{r do_sl3_detector_options, fig.width=6, fig.height=6, fig.align="center"}
-one_sums_ml_sensitive <- apply_detector(one_sums, sl3_model_detector, model_obj,0.1)
+You can tune the "sensitivity" of your custom machine learning algorithm by adjusting the threshold at which a point in time is labeled `true` or `false`. This is because the machine learning algorithm does not, itself, return a vector of booleans. Instead, the machine learning algorithm will return a vector of probabilities between 0 and 1. By default, `sl3_model_detector` thresholds probabilities at 0.5. In other words, probabilites above 0.5 are considered to be `label=TRUE` and below 0.5 `label=FALSE`. However, if you want to make your model more or less sensitive, you can adjust the threshold at which an event will be considered to be happening; lower thresholds result in lower sensitivity.
+
+```{r do_sl3_detector_options, fig.width=7, fig.height=7, fig.align="center"}
+one_sums_ml_sensitive <- apply_detector(one_sums, sl3_model_detector, model_obj, threshold=0.05)
 plot_sums(one_sums_ml_sensitive)
 ```
 
-# Sumsarize that biz
+# Processing and summarizing batch data
+
+Up to this point, most of these examples have focused on a single SUMS file. However, you will probably need to process many tens or hundreds of files. To do this, just give the `sumsarizer` package a path (`raw_sums_path`) to the directory of SUMS files. Then `import_folder()` to import the whole directory. You can use `apply_detector()` on the group of SUMS files imported by `import_folder()`. Then, create event-wise summaries with `list_events()`, and finally create file-wise summaries using `event_summaries()`. 
+
+TODO: we should probably rename list_events and event_summaries to something more intuitive.
+
 ```{r define_path, echo=FALSE}
   raw_sums_path <- file.path(example_data_path, "raw_sums_files")
 ```
