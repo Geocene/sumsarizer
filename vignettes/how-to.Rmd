@@ -26,12 +26,16 @@ options(width = 20)
 SUMSarizer is an R library that can be used to help analyze 
 
 # Installation
+
+Install the `sumsarizer` package from GitHub.
 ```{r installation, eval=FALSE}
 library(devtools)
 install_github("geocene/sumsarizer")
 ```
 
 # Setting up R
+
+Include all the necessary libraries and setup some temporary directories to hold data.
 
 ```{r setup}
 library(sumsarizer)
@@ -44,34 +48,44 @@ example_data_path <- file.path(tmp_path, "example_data")
 
 # Importing SUMS data
 
+We have provided some example SUMS files for download. Download from an AWS S3 bucket using the `download_example_data()` function. These files are a subset of the iButton DS1922E files collected for the study discussed in "Measuring and Increasing Adoption Rates of Cookstoves in a Humanitarian Crisis" by Wilson et al., 2016.
+
 ```{r download_example, eval=FALSE}
   download_example_data(example_data_path)
 ```
 
+Choose an example file for further exposition. The `import_sums()` function can import data from iButtons, Wellzion, Lascar, and kSUMS data loggers.
 
 ```{r import_sums}
   example_sums_file <- file.path(example_data_path, "raw_sums_files","alfashir1_B12.csv")
   one_sums <- import_sums(example_sums_file)
 ```
 
-# Applying Default SUMSarizer event detection functions
+# Applying default SUMSarizer event detection functions
+
+Detector functions apply a `true` or `false` label (represented by an integer `1` or `0`) to timestamp and value pairs. Later, these labels can be aggregated together into runs that define events.
+
 ## Threshold Detector
+
+The threshold detector will label points based solely on a threshold and a direction. The threshold detector can detect events by comparing a `threshold` to the value of the data using `>`, `<`, `>=`, or `<=`. The default values for the `threshold_detector()` are `threshold_detector(threshold=75, direction=">")`.
+
 ```{r do_threshold_detector}
-  one_sums_thresholded <- apply_detector(one_sums, threshold_detector)
+  one_sums_thresholded <- apply_detector(one_sums, threshold_detector(threshold=75, direction=">"))
 ```
 
 ## FireFinder Detector
+
+FireFinder is Geocene's simplified deterministic algorithm for detecting cooking events. FireFinder considers many features of the data including absolute temperature, slope, running quantiles, and gaps in data when labeling points true or false. Although FireFinder has many steps, we limit the arguements of the `firefinder_detector()` to just `primary_threshold`, `min_event_sec`, and  `min_break_sec`. Roughly speaking, the `primary_threshold` can be thought of as the value above which cooking is likely happening, and below which cooking is unlikely to be happening. However FireFinder may sometimes determine that points above `primary_threshold` are not cooking and points below  `primary_threshold` are indeed cooking. In order to...
+
 ```{r do_firefinder_detector}
   one_sums_firefinder <- apply_detector(one_sums, firefinder_detector)
 ```
-
 
 ## Summarize Detected Events
 
 ```{r summarize_events}
   events <- list_events(one_sums_firefinder)
 ```
-
 
 We can see the first few events here:
 
@@ -84,12 +98,9 @@ We can see the first few events here:
 ```
 
 
-
-
-# Creating a custom ensemble ML model
+# Creating a custom machine learning model
 
 ## Exporting SUMS data to TRAINSET for labeling
-
 
 ```{r do_export_trainset, eval=FALSE}
   raw_sums_path <- file.path(example_data_path, "raw_sums_files")
