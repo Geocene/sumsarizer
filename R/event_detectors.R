@@ -118,6 +118,7 @@ threshold_detector <- function(data, threshold = 75, direction = ">", ...) {
 #' @family event_detectors
 #' @export
 constant_detector <- function(data, run_length=2*60*60, ...) {
+  threshold <- as.numeric(run_length)
   setDT(data)
   sample_interval <- get_sample_interval(data)
   
