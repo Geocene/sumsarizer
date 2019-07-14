@@ -50,12 +50,12 @@ list_events_file <- function(data, event=NULL){
   labeled_data$event_num <- number_events(event)
   events <- labeled_data[!is.na(event_num),
                          list(start_time = min(timestamp, na.rm = T),
-                              stop_time = max(timestamp, na.rm = T),
+                              stop_time = max(timestamp, na.rm = T) + sample_interval,
                               min_temp = min(value, na.rm = T),
                               max_temp = max(value, na.rm = T)
                                ),
                          by=list(event_num)]
-  events[,duration_mins := (as.numeric(difftime(stop_time, start_time, unit='secs')) + sample_interval)/60]
+  events[,duration_mins := (as.numeric(difftime(stop_time, start_time, unit='secs')))/60]
   
   
   return(events)
