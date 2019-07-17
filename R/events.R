@@ -6,7 +6,8 @@
 #' @export
 number_events <- function(label){
   runs <- rle(label)
-  runs$values = ifelse(runs$values == T, cumsum(runs$values), NA)
+  runs$values[is.na(runs$values)] <- FALSE
+  runs$values = ifelse(runs$values == TRUE, cumsum(runs$values), NA)
   event_nums = inverse.rle(runs)
   return(event_nums)
 }
