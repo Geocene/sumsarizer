@@ -195,7 +195,7 @@ TODO: we should probably rename list_events and event_summaries to something mor
 ```{r define_path, echo=FALSE}
   raw_sums_path <- file.path(example_data_path, "raw_sums_files")
 ```
-```{r sumsarize_that_biz}
+```{r sumsarize_all_data}
   all_sums <- import_folder(raw_sums_path)
   all_sums <- apply_detector(all_sums, sl3_model_detector, model_obj)
   all_events <- list_events(all_sums)
@@ -203,4 +203,15 @@ TODO: we should probably rename list_events and event_summaries to something mor
   kable(head(summaries))
 ```
 
+# Joining processed data with metadata
 
+It is almost always necessary to compare analytics results to different metadata variables. For example, to compare average cooking times across stove types, fuel types, villages, etc. To join your metadata with your analytics results, make a metadata file with a format similar to `metadata.csv`. The `filename` column should match the filenes you imported using SUMSarizer, but the other metadata variables like `stove_type` can be defined by you. Joining metadata with time series or events is easy:
+
+TODO: add the metadata.csv file to S3 and make a metadata DT
+TODO: make some nice charts and tables showing off the power of metadata variables
+
+```{r join_metadata}
+  all_sums_with_metadata <- merge(all_sums, metadata, by="filename")
+  all_events_with_metadata <- merge(all_events, metadata, by="filename")
+  summaries_with_metadata <- merge(summaries, metadata, by="filename")
+```
