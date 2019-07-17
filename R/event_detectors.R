@@ -4,6 +4,7 @@
 #' 
 #' @param data a sumsarizer formatted data table for one sensor mission
 #' @param primary_threshold the main threshold to determine cooking
+#' @param min_event_temp min temperature for an event
 #' @param min_event_sec min number of seconds in a real event
 #' @param min_break_sec min number of seconds to makeup a real break
 #' @param ... not currently used
@@ -11,11 +12,13 @@
 #' @export
 firefinder_detector = function(data, 
                                primary_threshold = 75, 
+                               min_event_temp = NULL,
                                min_event_sec = 5*60,
                                min_break_sec = 30*60,
                                ...) {
   
   primary_threshold <- as.numeric(primary_threshold)
+  min_event_temp <- as.numeric(min_event_temp)
   min_event_sec <- as.numeric(min_event_sec)
   min_break_sec <- as.numeric(min_break_sec)
   setDT(data)
@@ -74,10 +77,11 @@ firefinder_detector = function(data,
   data[,"event_raw":=smooth_events(event_raw, sample_interval, min_event_sec, min_break_sec)]
   
   #remove events with very low cooking temps
-  data[,"event_num":=number_events(event_raw)]
-  data[,"event_max":=max(value),by=list(event_num)]
-  data[event_max<primary_threshold,"event_raw":=FALSE]
-  
+  if(!is.null(min_event_temp)){
+    data[,"event_num":=number_events(event_raw)]
+    data[,"event_max":=max(value),by=list(event_num)]
+    data[event_max<min_event_temp,"event_raw":=FALSE]
+  }
   #remove events for data that is out of range and is probably an error
   data[!(data$value < 1000 & data$value > -50),"event_raw":=FALSE]
   
