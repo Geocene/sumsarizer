@@ -125,6 +125,10 @@ constant_detector <- function(data, run_length=2*60*60, ...) {
   window_size <- run_length / sample_interval
   window_size <- min(window_size, 5)
   
+  if ((window_size*2)>nrow(data)){
+    return(rep(FALSE,nrow(data)))
+  }
+  
   value_sd <- runsd(data$value,
                     window_size,
                     align = 'right',
