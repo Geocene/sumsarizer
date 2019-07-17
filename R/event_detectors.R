@@ -126,22 +126,15 @@ constant_detector <- function(data, run_length=2*60*60, ...) {
   setDT(data)
   sample_interval <- get_sample_interval(data)
   
-  window_size <- run_length / sample_interval
-  window_size <- min(window_size, 5)
+  window_size <- round(run_length / sample_interval)
+  window_size <- max(window_size, 5)
   
-  if ((window_size*2)>nrow(data)){
-    return(rep(FALSE,nrow(data)))
-  }
-  
-  value_sd <- runsd(data$value,
-                    window_size,
-                    align = 'right',
-                    endrule='NA')
-
+  runs <- rle(data$value)
+  runs$values <- runs$lengths>=window_size
+  event <- inverse.rle(runs)
   #if the data has not changed at all in run_length data points, 
   # the thermocouple is probably broken
-  event <- value_sd==0
-  event[is.na(event)] <- FALSE
+
   return(event)
 }
 
