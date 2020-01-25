@@ -23,15 +23,10 @@ firefinder_detector = function(data,
   min_break_sec <- as.numeric(min_break_sec)
   setDT(data)
   data <- copy(data)
-  
-  
   max_run_length <- 100
-  
     
   #CALCULATE FEATURES
-  
   sample_interval <- get_sample_interval(data)
-  
   sample_interval_mins <- sample_interval/60
   
   #make a column of 1st derivative (degC/minute)
@@ -72,7 +67,6 @@ firefinder_detector = function(data,
   
   #remove places with gaps longer than the sample interval
   data[difftimes > sample_interval, "event_raw":= FALSE]
-  
   
   data[,"event_raw":=smooth_events(event_raw, sample_interval, min_event_sec, min_break_sec)]
   
